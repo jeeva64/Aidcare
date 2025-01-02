@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h1>Add Item</h1>
+<form method="POST"  enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="name">Item Name:</label>
+    <input type="text" id="name" name="name" required><br><br>
+    
+    <label for="description">Item Description:</label>
+    <textarea id="description" name="description" required></textarea><br><br>
+
+    <label for="product">Upload Image:</label>
+    <input type="file" name="product" id="product" required><br><br>
+
+    <button type="submit" class="btn btn-primary">Add Item</button>
+</form>
+<br>
+<a href="{% url 'donor_dashboard' %}">Back to Dashboard</a>
+{% endblock %}

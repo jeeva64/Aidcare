@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<form method="POST" action="{% url 'register'%}" id="registerForm" novalidate><br>
+    {% csrf_token %}
+    {% if errors %}
+        <ul style="color:red;">
+            {% for tag,error in errors.items %}
+            <li>{{tag}}:{{error}}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <label for="uname">Username:</label><br>
+    <input type="text" id="uname" name="username" placeholder="Enter Your Username" required><br>
+    <span id="usernameError" style="color:red;"></span><br>
+
+    <label for="mail">Email:</label><br>
+    <input type="email" id="mail" name="email" placeholder="Enter Your Email" required><br>
+    <span id="emailError" style="color:red;"></span><br>
+
+    <label for="address">Address:</label><br>
+    <input type="text" id="address" name="address" placeholder="Enter Your Address" required><br>
+    <span id="addressError" style="color:red;"></span><br>
+
+    <label for="district">District:</label><br>
+    <input type="text" id="district" name="district" placeholder="Enter Your District"required><br>
+    <span id="districtError" style="color:red;"></span><br>
+
+    <label for="u_type">User Type:</label><br>
+    <select name="user_type" id="u_type" required>
+        <option value="">--select--</option>
+        <option value="donor">Donor</option>
+        <option value="trust">Trust/Orphanage</option>
+    </select><br>
+    <span id="userTypeError" style="color:red;"></span><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" name="password" id="password" placeholder="Enter Your Password" required><br>
+    <span id="passwordError" style="color:red;"></span><br>
+
+    <labe for="c_pass">Confirm Password:</label><br>
+    <input type="password" name="cpassword" id="c_pass" placeholder="Enter Your Confirm Password" required><br>
+    <span id="confirmpasswordError" style="color:red;"></span><br>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+    <button type="reset" class="btn btn-danger">Reset</button>
+</form>
+<br>
+<p>Already have an account?<a href="{% url 'login' %}"> Login here.</a></p>
+<script src="{% static 'js/validation.js' %}"></script>
+{% endblock %}

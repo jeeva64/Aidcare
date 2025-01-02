@@ -1,0 +1,118 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content%}
+
+<div class="hero">
+    <h1>Make a Difference Today</h1>
+    <p>Donate your old products or help fulfill a request from a local Trust/Orphanage in your district.</p>
+</div>
+   
+<div id="donationSlider" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#donationSlider" data-slide-to="0" class="active"></li>
+        <li data-target="#donationSlider" data-slide-to="1"></li>
+        <li data-target="#donationSlider" data-slide-to="2"></li>
+    </ol>
+
+    <div class="carousel-inner" align="center">
+        <div class="item active">
+            <img src="{% static 'images/donation1.jpg' %}" alt="Donor with items" style="width:75%; height:400px;">
+            <div class="carousel-caption">
+                <h3>Donors Helping the Needy</h3>
+            </div>
+        </div>
+
+        <div class="item">
+            <img src="{% static 'images/donation2.jpg' %}" alt="Orphanage Receiving" style="width:75%;height:400px;">
+            <div class="carousel-caption">
+                <h3>Bridging the Gap</h3>
+            </div>
+        </div>
+
+        <div class="item">
+            <img src="{% static 'images/donation3.jpg' %}" alt="Volunteers" style="width:75%;height:400px;">
+            <div class="carousel-caption">
+                <h3>Join Our Mission</h3>
+            </div>
+        </div>
+    </div>
+</div><br>
+
+<div class="call-to-action">
+    <h2>How You Can Help</h2>
+    <p>Register as a donor or a trust to start contributing or requesting donations today. Let's build a better future together.</p>
+</div>
+
+<div class="features">
+    <div class="feature-box">
+        <h2><span class="glyphicon glyphicon-user"></span> For Donors</h2>
+        <p>Maintain your inventory, view requests, and decide where your items make the most impact.</p>
+    </div>
+    <div class="feature-box">
+        <h2><span class="glyphicon glyphicon-home"></span> For Trusts</h2>
+        <p>Create posts to request specific items and connect with local donors in your district.</p>
+    </div>
+</div>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f9f9f9;
+    }
+
+    .call-to-action {
+        background-color: #4CAF50;
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .call-to-action h2 {
+        font-size: 2em;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 4px;
+        background-color: #f4f4f4;
+    }
+
+    .hero h1 {
+        font-size: 3em;
+        color: #333;
+    }
+
+    .hero p {
+        font-size: 1.2em;
+        color: #666;
+    }
+
+    .features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .feature-box {
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+        border-radius: 10px;
+    }
+
+    .feature-box h2 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .feature-box p {
+        font-size: 1em;
+        color: #777;
+    }
+</style>
+{% endblock content%}
+    
