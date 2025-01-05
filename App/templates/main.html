@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,81 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <title>{% block title %}Aidcare{% endblock %}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f9f9f9;
-        }
-
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 1px;
-            text-align: center;
-        }
-        .navbar {
-            margin-bottom: 0;
-            background-color: #4caf86;
-            border: 0;
-            font-size: 14px !important;
-            letter-spacing: 1px;
-        }
-
-        .navbar a {
-            color: #fff !important;
-        }
-       
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            margin-top: 20px;
-        }
-        @media (min-width: 500px) {
-            .navbar-nav {
-            float: left;
-            margin: 0;
-            }
-        }
-        @media (min-width: 768px) {
-            .navbar-nav>li {
-                float: left;
-            }
-        }
-        footer a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}"></link>
 </head>
 <body>
-    <!--<header>
-        <nav>
-            <h1>Virtual Donation Board</h1>
-            <a href="/home">Home</a>
-            {% if user.is_authenticated %}
-                <a href="/dashboard">Dashboard</a>
-                <a href="/logout">Logout</a>
-            {% else %}
-                <a href="/login">Login</a>
-                <a href="/register">Register</a>
-            {% endif %}
-        </nav>
-    </header>-->
     <header>
         <h1>Virtual Donation Board</h1>
         <!--<p>Connecting Donors and Trusts/Orphanages Within the Same District</p>-->
     </header>
-    <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
+    <nav class="navbar navbar-inverse" style="height: 50px;">
+        <div class="container-fluid" style="height: 50px;">
             <ul class="nav navbar-nav">
-                <li><a href="/home" >Home</a></li>
+                <li><a href="/" >Home</a></li>      
+                {% block nav %}
                 <li><a href="/register">Register</a></li>
                 <li><a href="/login">Login</a></li>
-                <li><a href="/about">About</a></li>
+                <li><a href="/about">About</a></li> 
                 <li><a href="/contact">Contact</a></li>
+                {% endblock %}
             </ul>
         </div>
     </nav>

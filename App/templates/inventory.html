@@ -1,6 +1,19 @@
 {% extends 'main.html' %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/donor_dashboard">Dashboard</a></li>
+        <li><a href="{% url 'add_item' %}">Add Item</a><br></li>
+        <li><a href="{% url 'inventory' %}">View Inventory</a><br></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
 {% block content %}
-<h1>Your Donation Inventory List</h1>
+<h2>Your Donation Inventory List</h2>
 <table border="1">
     <thead>
         <tr>
@@ -16,8 +29,9 @@
             <td><h4>{{ product.1 }}</h4></td>
             <td><h4>{{ product.2 }}</h4></td>
             <td><img src="{{ product.3 }}" alt="product-Image" style="width: 100%; height: 200px; object-fit: cover;"></td>
-            <td>
-                <a href="{% url 'delete_inventory' product.0 %}" class="btn btn-danger">Delete</a>
+            <td align="center">
+                <a href="{% url 'mark_as_donated' product.0 %}" class="btn btn-primary">Mark as Donated</a><br><br>
+                <a href="{% url 'delete_inventory' product.0 %}" class="btn btn-danger">Delete Item</a>
             </td>
         </tr>
         {% empty %}
@@ -27,5 +41,31 @@
         {% endfor %}
     </tbody>
 </table><br>
-<a href="{% url 'donor_dashboard' %}">Back to Dashboard</a>
+<h2>Your Donation History</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for history in historys %}
+        <tr>
+            <td><h4>{{ history.1 }}</h4></td>
+            <td><h4>{{ history.2 }}</h4></td>
+            <td><img src="{{ history.3 }}" alt="product-Image" style="width: 100%; height: 200px; object-fit: cover;"></td>
+            <td>
+                <a href="{% url 'delete_inventory' history.0 %}" class="btn btn-danger">Delete Item</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6"><h4>No Products in your donation History.</h4></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table><br>
 {% endblock %}

@@ -49,7 +49,6 @@ def create_tables():
                 item_id INT NOT NULL,
                 trust_id INT NOT NULL,
                 status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-                FOREIGN KEY (item_id) REFERENCES inventory(id),
                 FOREIGN KEY (trust_id) REFERENCES users(id)
             );
         """)
@@ -138,20 +137,6 @@ def login(request):
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
 
-def trust_dashboard(request):
-    if 'user_id' not in request.session or request.session['user_type'] != 'trust':
-        return redirect('login')
-    trust_id = request.session['user_id']
-    if not trust_id:
-        return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT id, title, description, image_path FROM posts WHERE trust_id = %s
-        """, [trust_id])
-        posts = cursor.fetchall()
-
-    return render(request, 'trust_dashboard.html', {'posts': posts})
-
 def donor_dashboard(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'donor':
         return redirect('login')
@@ -163,13 +148,24 @@ def donor_dashboard(request):
         donor_district = cursor.fetchone()[0]
 
         cursor.execute("""
-            SELECT posts.id, posts.title, posts.description, posts.image_path, users.username
+            SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username
             FROM posts
             INNER JOIN users ON posts.trust_id = users.id
             WHERE posts.district = %s AND users.is_approved = TRUE
         """, [donor_district])
         posts = cursor.fetchall()
     return render(request, 'donor_dashboard.html', {'posts': posts})
+
+def donate(request,item_id,trust_id):
+    if request.method == 'POST' and 'user_id' in request.session:
+        donor_id = request.session.get('user_id')
+        if not donor_id:
+            return redirect('login')
+    with connection.cursor() as cursor:
+        status="pending"
+        cursor.execute(""" INSERT INTO request (item_id,trust_id,status)
+                VALUES (%s, %s,%s)""",[item_id,trust_id,status])
+    return redirect('donor_dashboard')
 
 def add_item(request):
     if request.method == 'POST' and 'user_id' in request.session and request.FILES['product']:
@@ -188,7 +184,7 @@ def add_item(request):
                 INSERT INTO inventory (name, description, image_path, donor_id, is_donated)
                 VALUES (%s, %s, %s, %s, %s)
             """, [name, description, image_path, donor_id, False])
-        return redirect('donor_dashboard')
+        return redirect('inventory')
     return render(request, 'add_item.html')
 
 def inventory(request):
@@ -197,9 +193,25 @@ def inventory(request):
         if not donor_id:
             return redirect('login')
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT id,name,description,image_path from inventory where donor_id=%s""",[donor_id])
+            cursor.execute("""SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=FALSE""",[donor_id])
             inventorys=cursor.fetchall()
-    return render(request,'inventory.html',{'inventorys':inventorys})     
+            cursor.execute("""SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=TRUE""",[donor_id])
+            historys=cursor.fetchall()
+    return render(request,'inventory.html',{'inventorys':inventorys,'historys':historys})     
+
+def mark_as_donated(request, item_id):
+    if 'user_id' not in request.session or request.session['user_type'] != 'donor':
+        return redirect('login')
+
+    donor_id = request.session.get('user_id')
+    if not donor_id:
+        return redirect('login')
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            UPDATE inventory SET is_donated = TRUE WHERE id = %s AND donor_id = %s
+        """, [item_id, donor_id])
+
+    return render(request,'inventory.html')
 
 def delete_inventory(request,id):
     if 'user_id' in request.session:
@@ -209,7 +221,21 @@ def delete_inventory(request,id):
         with connection.cursor() as cursor:
             cursor.execute("""DELETE from inventory where id=%s and donor_id=%s""",[id,donor_id])
         return redirect(donor_dashboard)   
-    return render(request,'donor_dashboard.html') 
+    return render(request,'inventory.html') 
+
+def trust_dashboard(request):
+    if 'user_id' not in request.session or request.session['user_type'] != 'trust':
+        return redirect('login')
+    trust_id = request.session['user_id']
+    if not trust_id:
+        return redirect('login')
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id, title, description, image_path FROM posts WHERE trust_id = %s
+        """, [trust_id])
+        posts = cursor.fetchall()
+
+    return render(request, 'trust_dashboard.html', {'posts': posts})
 
 def create_post(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
@@ -250,20 +276,6 @@ def delete_post(request, post_id):
             cursor.execute("DELETE FROM posts WHERE id = %s", [post_id])
 
     return redirect('trust_dashboard')
-
-def mark_as_donated(request, item_id):
-    if 'user_id' not in request.session or request.session['user_type'] != 'donor':
-        return redirect('login')
-
-    donor_id = request.session.get('user_id')
-    if not donor_id:
-        return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            UPDATE inventory SET is_donated = TRUE WHERE id = %s AND donor_id = %s
-        """, [item_id, donor_id])
-
-    return redirect('donor_dashboard')
 
 def admin_panel(request):
     if 'is_admin' not in request.session or not request.session['is_admin']:

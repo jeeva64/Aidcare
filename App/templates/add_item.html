@@ -1,4 +1,17 @@
 {% extends 'main.html' %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/donor_dashboard">Dashboard</a></li>
+        <li><a href="{% url 'add_item' %}">Add Item</a><br></li>
+        <li><a href="{% url 'inventory' %}">View Inventory</a><br></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 <h1>Add Item</h1>
@@ -16,5 +29,4 @@
     <button type="submit" class="btn btn-primary">Add Item</button>
 </form>
 <br>
-<a href="{% url 'donor_dashboard' %}">Back to Dashboard</a>
 {% endblock %}

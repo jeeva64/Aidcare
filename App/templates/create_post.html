@@ -1,4 +1,16 @@
 {% extends 'main.html'%}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/trust_dashboard">Dashboard</a></li>
+        <li><a href="{% url 'create_post' %}">Create New Post</a></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
 {% block content %}
 <h2>Create Post</h2>
 <form method="post" enctype="multipart/form-data">
@@ -17,5 +29,4 @@
 
     <input type="submit" class="btn btn-primary" value="Create Post">
 </form><br>
-<a href="{% url 'trust_dashboard' %}">Back to Dashboard</a>
 {% endblock %}

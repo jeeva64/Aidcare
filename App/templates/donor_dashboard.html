@@ -1,5 +1,18 @@
 {% extends 'main.html' %}
 {% block title %}Aidcare | Donor Dashboard{% endblock %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/donor_dashboard">Dashboard</a></li>
+        <li><a href="{% url 'add_item' %}">Add Item</a><br></li>
+        <li><a href="{% url 'inventory' %}">View Inventory</a><br></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 <h1>Welcome Donor!</h1>
@@ -9,12 +22,9 @@
             <h3>{{ post.1 }}</h3>
             <p>{{ post.2 }}</p>
             <img src="{{ post.3 }}" alt="Post Image" style="width: 100%; height: 200px; object-fit: cover;">
-            <p><strong>Posted by:</strong> {{ post.4 }}</p>
-            <a href=""><button style="margin-top: 10px;" class="btn btn-primary">Donate</button></a>
+            <p><strong>Posted by:</strong> {{ post.5 }}</p>
+            <a href="{%url 'donate' post.0 post.4 %}"><button style="margin-top: 10px;" class="btn btn-primary">Donate</button></a>
         </div>
     {% endfor %}
 </div>
-<a href="{% url 'add_item' %}">Add New Item</a><br>
-<a href="{% url 'inventory' %}">View Your Inventory</a><br>
-<a href="{% url 'logout' %}">Logout</a>
 {% endblock %}
