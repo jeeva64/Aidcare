@@ -1,16 +1,23 @@
-document.getElementById("registerForm").addEventListener("submit",function(e){
+document.getElementById("registerForm").addEventListener("submit",function(event){
     
     let valid=true;
     const username=document.getElementById("uname").value.trim();
-    if(username.length<3){
-        document.getElementById("usernameError").textContent="Username must be atleast 3 characters long.";
+    const email=document.getElementById("mail").value.trim();
+    const mobile=document.getElementById("mobile").value.trim();
+    const address=document.getElementById("address").value.trim();
+    const district=document.getElementById("district").value;
+    const user_type=document.getElementById("u_type").value;
+    const password=document.getElementById("password").value.trim();
+    const confirm_pass=document.getElementById("c_pass").value.trim();
+
+    if(username.length<3 || username.length > 100){
+        document.getElementById("usernameError").textContent="Username must be between 3 and 100 characters.";
         valid=false;
     }
     else{
         document.getElementById("usernameError").textContent="";
     }
 
-    const email=document.getElementById("mail").value.trim();
     const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(email===""){
         document.getElementById("emailError").textContent="Email is required.";
@@ -24,7 +31,15 @@ document.getElementById("registerForm").addEventListener("submit",function(e){
         document.getElementById("emailError").textContent="";
     }
 
-    const address=document.getElementById("address").value.trim();
+    var phoneno = /^\d{10}$/;
+    if(!mobile.match(phoneno)){
+        document.getElementById("mobileError").textContent="Mobile Number must be exactly 10 digits.";
+        valid=false;
+    }
+    else{
+        document.getElementById("mobileError").textContent="";
+    }
+    
     if(address===""){
         document.getElementById("addressError").textContent="Address is required.";
         valid=false;
@@ -33,7 +48,6 @@ document.getElementById("registerForm").addEventListener("submit",function(e){
         document.getElementById("addressError").textContent="";
     }
 
-    const district=document.getElementById("district").value.trim();
     if(district===""){
         document.getElementById("districtError").textContent="Please select a district.";
         valid=false;
@@ -42,7 +56,6 @@ document.getElementById("registerForm").addEventListener("submit",function(e){
         document.getElementById("districtError").textContent="";
     }
 
-    const user_type=document.getElementById("u_type").value;
     if(user_type===""){
         document.getElementById("userTypeError").textContent="Please Select a User Type.";
         valid=false;
@@ -51,16 +64,14 @@ document.getElementById("registerForm").addEventListener("submit",function(e){
         document.getElementById("userTypeError").textContent="";
     }
 
-    const password=document.getElementById("password").value.trim();
-    if(password.length<8){
-        document.getElementById("passwordError").textContent="Password must be atleast 8 characters long.";
+    if(password.length<8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password)){
+        document.getElementById("passwordError").textContent="Password must be atleast 8 characters long and include uppercase, lowercase, a number, and a special character.";
         valid=false;
     }
     else{
         document.getElementById("passwordError").textContent="";
     }
 
-    const confirm_pass=document.getElementById("c_pass").value.trim();
     if(confirm_pass!=password){
         document.getElementById("confirmpasswordError").textContent="Password Mismatch!";
         valid=false;
@@ -70,6 +81,6 @@ document.getElementById("registerForm").addEventListener("submit",function(e){
     }
 
     if(!valid){
-        e.preventDefault();
+        event.preventDefault();
     }
 });

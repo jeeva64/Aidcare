@@ -18,7 +18,8 @@ def create_tables():
                 address TEXT NOT NULL,
                 district VARCHAR(100) NOT NULL,
                 user_type ENUM('donor', 'trust') NOT NULL,
-                is_approved BOOLEAN DEFAULT FALSE
+                is_approved BOOLEAN DEFAULT FALSE,
+                mobile varchar(10) not null
             );
         """)
         cursor.execute("""
@@ -40,6 +41,7 @@ def create_tables():
                 image_path VARCHAR(200) DEFAULT NULL,
                 donor_id INT NOT NULL,
                 is_donated BOOLEAN DEFAULT FALSE,
+                status BOOLEAN not null,
                 FOREIGN KEY (donor_id) REFERENCES users(id)
             );
         """)
@@ -63,6 +65,7 @@ def register(request):
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST['email']
+        mobile=request.POST['mobile']
         password = request.POST['password']
         cpassword=request.POST['cpassword']
         address = request.POST['address']
@@ -75,16 +78,21 @@ def register(request):
 
         errors={}
 
-        if len(username)<3:
-            errors["username"]="Username must be at least 3 characters long."
+        if len(username)<3 or len(username)>100:
+            errors["username"]="Username must be between 3 and 100 characters."
 
         try:
             validate_email(email)
         except ValidationError:
             errors["email"]="Invalid email format."    
             
-        if len(password)<8:
-            errors["password"]="Password must be atleast 8 characters long."
+        if len(mobile)<10:
+            errors["Phone Number"]="Mobile Number must contain 10 digits."
+
+        if (len(password)<8 or not any(char.isupper() for char in password) \
+            or not any(char.islower() for char in password) or not any(char.isdigit() for char in password) \
+            or not any(char in "!@#$%^&*" for char in password)):
+            errors["password"]="Password must be atleast 8 characters long and include uppercase, lowercase, a number, and a special character."
 
         if cpassword!=password:
             errors["confirmpassword"]="Password do not match."
@@ -103,9 +111,9 @@ def register(request):
                             
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO users (username, email, password, address, district, user_type, is_approved)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, [username, email, password, address, district, user_type, is_approved])
+                INSERT INTO users (username, email, password, address, district, user_type, is_approved,mobile)
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
+            """, [username, email, password, address, district, user_type, is_approved,mobile])
 
         if not is_approved:
             return render(request, 'pending_approval.html')
@@ -151,20 +159,19 @@ def donor_dashboard(request):
             SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username
             FROM posts
             INNER JOIN users ON posts.trust_id = users.id
-            WHERE posts.district = %s AND users.is_approved = TRUE
+            WHERE posts.district = %s AND users.is_approved = TRUE AND posts.status=FALSE
         """, [donor_district])
         posts = cursor.fetchall()
     return render(request, 'donor_dashboard.html', {'posts': posts})
 
-def donate(request,item_id,trust_id):
+def donate(request,post_id,trust_id):
     if request.method == 'POST' and 'user_id' in request.session:
         donor_id = request.session.get('user_id')
         if not donor_id:
             return redirect('login')
-    with connection.cursor() as cursor:
-        status="pending"
-        cursor.execute(""" INSERT INTO request (item_id,trust_id,status)
-                VALUES (%s, %s,%s)""",[item_id,trust_id,status])
+        with connection.cursor() as cursor:
+            cursor.execute("""update posts set status=TRUE where id=%s and trust_id=%s""",[post_id,trust_id])
+            cursor.execute(""" INSERT INTO request (item_id,trust_id,donor_id,status)VALUES (%s, %s,%s,%s)""",[post_id,trust_id,donor_id,"pending"])
     return redirect('donor_dashboard')
 
 def add_item(request):
@@ -236,6 +243,28 @@ def trust_dashboard(request):
         posts = cursor.fetchall()
 
     return render(request, 'trust_dashboard.html', {'posts': posts})
+
+def view_request(request):
+    if 'user_id' not in request.session or request.session['user_type'] != 'trust':
+        return redirect('login')
+    trust_id = request.session['user_id']
+    if not trust_id:
+        return redirect('login')
+    with connection.cursor() as cursor:
+        cursor.execute("""
+        SELECT 
+            users.username,users.mobile,posts.title,`request`.id 
+        FROM 
+            users
+        INNER JOIN 
+            posts ON users.id = posts.trust_id
+        INNER JOIN 
+            `request` ON `request`.post_id = posts.id
+        WHERE 
+            `request`.status = %s AND `request`.trust_id = %s""", ["pending", trust_id])
+        requests=cursor.fetchall()
+        print(requests)
+    return render(request,'view_request.html',{'requests':requests})
 
 def create_post(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':

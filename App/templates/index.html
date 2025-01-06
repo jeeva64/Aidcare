@@ -2,13 +2,13 @@
 {% load static %}
 {% block content%}
 
-<div class="hero">
+<div class="hero container-fluid">
     <h1>Make a Difference Today</h1>
     <p>Donate your old products or help fulfill a request from a local Trust/Orphanage in your district.</p>
 </div>
    
 <div id="donationSlider" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators">
+    <ol class="carousel-indicators" style="list-style: none;">
         <li data-target="#donationSlider" data-slide-to="0" class="active"></li>
         <li data-target="#donationSlider" data-slide-to="1"></li>
         <li data-target="#donationSlider" data-slide-to="2"></li>
@@ -18,21 +18,21 @@
         <div class="item active">
             <img src="{% static 'images/donation1.jpg' %}" alt="Donor with items" style="width:75%; height:400px;">
             <div class="carousel-caption">
-                <h3>Donors Helping the Needy</h3>
+                <h3 style="color:darkgrey;"><strong>Donors Helping the Needy</strong></h3>
             </div>
         </div>
 
         <div class="item">
             <img src="{% static 'images/donation2.jpg' %}" alt="Orphanage Receiving" style="width:75%;height:400px;">
             <div class="carousel-caption">
-                <h3>Bridging the Gap</h3>
+                <h3 style="color:darkgrey;"><strong>Bridging the Gap</strong></h3>
             </div>
         </div>
 
         <div class="item">
             <img src="{% static 'images/donation3.jpg' %}" alt="Volunteers" style="width:75%;height:400px;">
             <div class="carousel-caption">
-                <h3>Join Our Mission</h3>
+                <h3 style="color:darkgrey;"><strong>Join Our Mission</strong></h3>
             </div>
         </div>
     </div>

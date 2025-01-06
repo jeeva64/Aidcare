@@ -1,0 +1,42 @@
+{% extends 'main.html' %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/trust_dashboard">Dashboard</a></li>
+        <li><a href="{% url 'create_post' %}">New Post</a></li>
+        <li><a href="{% url 'view_request' %}">Post Response</a></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+<h2>Your Donation Inventory List</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Donor Name</th>
+            <th>Mobile Number</th>
+            <th>Post Title</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in requests %} 
+        <tr>
+            <td><h4>{{ request.0 }}</h4></td>
+            <td><h4>{{ request.1 }}</h4></td>
+            <td><h4>{{ request.2 }}</h4></td>
+            <td align="center">
+                <a href="" class="btn btn-primary">Mark as Approved</a><br><br>
+                <a href="" class="btn btn-danger">Delete post</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table><br>
+
+{% endblock %}
+
