@@ -2,7 +2,8 @@
 {% block nav %}
     {% if 'user_id' in request.session %}
         <li><a href="/trust_dashboard">Dashboard</a></li>
-        <li><a href="{% url 'create_post' %}">Create New Post</a></li>
+        <li><a href="{% url 'create_post' %}">New Post</a></li>
+        <li><a href="{% url 'view_request' %}">Post Response</a></li>
         <li><a href="/logout">Logout</a></li>
     {% else %}
         <li><a href="/register">Register</a></li>

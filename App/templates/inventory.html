@@ -13,6 +13,7 @@
     {% endif %}
 {% endblock %}
 {% block content %}
+<form method="GET">
 <h2>Your Donation Inventory List</h2>
 <table border="1">
     <thead>
@@ -67,5 +68,6 @@
         </tr>
         {% endfor %}
     </tbody>
-</table><br>
+</table>
+</form>
 {% endblock %}

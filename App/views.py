@@ -50,10 +50,23 @@ def create_tables():
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 item_id INT NOT NULL,
                 trust_id INT NOT NULL,
-                status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+                progress ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
                 FOREIGN KEY (trust_id) REFERENCES users(id)
             );
         """)
+
+def execute_query(query,params=None,fetch_one=False,commit=False):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query,params)
+            if commit:
+                connection.commit()
+            if fetch_one:
+                return cursor.fetchone()
+            return cursor.fetchall()
+    except Exception as e:
+        print(f"Error executing query: {e}")
+        return None        
 
 def home(request):
     return render(request, "index.html")
@@ -108,12 +121,10 @@ def register(request):
 
         if errors:
             return render(request,"register.html",{"errors":errors})
-                            
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO users (username, email, password, address, district, user_type, is_approved,mobile)
-                VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
-            """, [username, email, password, address, district, user_type, is_approved,mobile])
+        
+        query="INSERT INTO users (username, email, password, address, district, user_type, is_approved,mobile) VALUES (%s, %s, %s, %s, %s, %s, %s,%s)"
+        params=[username, email, password, address, district, user_type, is_approved,mobile]
+        execute_query(query,params,commit=True)
 
         if not is_approved:
             return render(request, 'pending_approval.html')
@@ -126,11 +137,9 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
 
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT id, user_type, is_approved FROM users 
-                WHERE username = %s AND password = %s""", [username, password])
-            user = cursor.fetchone()
+        query="SELECT id, user_type, is_approved FROM users WHERE username = %s AND password = %s"
+        params=[username, password]
+        user=execute_query(query,params,fetch_one=True)
 
         if user:
             if not user[2]:  
@@ -151,17 +160,14 @@ def donor_dashboard(request):
     donor_id = request.session.get('user_id')
     if not donor_id:
         return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT district FROM users WHERE id = %s", [donor_id])
-        donor_district = cursor.fetchone()[0]
 
-        cursor.execute("""
-            SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username
-            FROM posts
-            INNER JOIN users ON posts.trust_id = users.id
-            WHERE posts.district = %s AND users.is_approved = TRUE AND posts.status=FALSE
-        """, [donor_district])
-        posts = cursor.fetchall()
+    query="SELECT district FROM users WHERE id = %s"
+    params=[donor_id]
+    donor_district = execute_query(query,params,fetch_one=True)[0]
+
+    query1="SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username FROM posts INNER JOIN users ON posts.trust_id = users.id WHERE posts.district = %s AND users.is_approved = TRUE AND posts.status=FALSE"
+    params1=[donor_district]
+    posts = execute_query(query1,params1,fetch_one=False)
     return render(request, 'donor_dashboard.html', {'posts': posts})
 
 def donate(request,post_id,trust_id):
@@ -169,9 +175,15 @@ def donate(request,post_id,trust_id):
         donor_id = request.session.get('user_id')
         if not donor_id:
             return redirect('login')
-        with connection.cursor() as cursor:
-            cursor.execute("""update posts set status=TRUE where id=%s and trust_id=%s""",[post_id,trust_id])
-            cursor.execute(""" INSERT INTO request (item_id,trust_id,donor_id,status)VALUES (%s, %s,%s,%s)""",[post_id,trust_id,donor_id,"pending"])
+
+        query="update posts set status=TRUE where id=%s and trust_id=%s"
+        params=[post_id,trust_id]
+        execute_query(query,params,commit=True)
+
+        query1=" INSERT INTO requests (item_id,trust_id,donor_id,progress)VALUES (%s, %s,%s,%s)"
+        params1=[post_id,trust_id,donor_id,"pending"]
+        execute_query(query1,params1,commit=True)
+
     return redirect('donor_dashboard')
 
 def add_item(request):
@@ -186,48 +198,54 @@ def add_item(request):
         fs = FileSystemStorage()
         filename = fs.save(image.name, image)
         image_path = fs.url(filename)
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO inventory (name, description, image_path, donor_id, is_donated)
-                VALUES (%s, %s, %s, %s, %s)
-            """, [name, description, image_path, donor_id, False])
+
+        query="INSERT INTO inventory (name, description, image_path, donor_id, is_donated) VALUES (%s, %s, %s, %s, %s)"
+        params=[name, description, image_path, donor_id, False]
+        execute_query(query,params,commit=True)
         return redirect('inventory')
+
     return render(request, 'add_item.html')
 
 def inventory(request):
-    if 'user_id' in request.session:
+    if 'user_id' in request.session and request.method=="GET":
         donor_id=request.session['user_id']
         if not donor_id:
             return redirect('login')
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=FALSE""",[donor_id])
-            inventorys=cursor.fetchall()
-            cursor.execute("""SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=TRUE""",[donor_id])
-            historys=cursor.fetchall()
-    return render(request,'inventory.html',{'inventorys':inventorys,'historys':historys})     
+
+        query="SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=FALSE"
+        params=[donor_id]
+        inventorys=execute_query(query,params,fetch_one=False)
+
+        query1="SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=TRUE"
+        params1= [donor_id]
+        historys=execute_query(query1,params1,fetch_one=False)
+        return render(request,'inventory.html',{'inventorys':inventorys,'historys':historys})
+    return render(request,'inventory.html')     
 
 def mark_as_donated(request, item_id):
     if 'user_id' not in request.session or request.session['user_type'] != 'donor':
         return redirect('login')
+    if request.method=="GET":
+        donor_id = request.session.get('user_id')
+        if not donor_id:
+            return redirect('login')
 
-    donor_id = request.session.get('user_id')
-    if not donor_id:
-        return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            UPDATE inventory SET is_donated = TRUE WHERE id = %s AND donor_id = %s
-        """, [item_id, donor_id])
-
+        query=" UPDATE inventory SET is_donated = TRUE WHERE id = %s AND donor_id = %s"
+        params= [item_id, donor_id]
+        execute_query(query,params,commit=True)
+        return redirect('inventory')
     return render(request,'inventory.html')
 
 def delete_inventory(request,id):
-    if 'user_id' in request.session:
+    if 'user_id' in request.session and request.method=="GET":
         donor_id=request.session['user_id']
         if not donor_id:
             return redirect('login')
-        with connection.cursor() as cursor:
-            cursor.execute("""DELETE from inventory where id=%s and donor_id=%s""",[id,donor_id])
-        return redirect(donor_dashboard)   
+
+        query="DELETE from inventory where id=%s and donor_id=%s"
+        params=[id,donor_id]
+        execute_query(query,params,commit=True)
+        return redirect('inventory')   
     return render(request,'inventory.html') 
 
 def trust_dashboard(request):
@@ -236,11 +254,10 @@ def trust_dashboard(request):
     trust_id = request.session['user_id']
     if not trust_id:
         return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT id, title, description, image_path FROM posts WHERE trust_id = %s
-        """, [trust_id])
-        posts = cursor.fetchall()
+
+    query="SELECT id, title, description, image_path FROM posts WHERE trust_id = %s"
+    params=[trust_id]
+    posts =execute_query(query,params,fetch_one=False)
 
     return render(request, 'trust_dashboard.html', {'posts': posts})
 
@@ -250,20 +267,11 @@ def view_request(request):
     trust_id = request.session['user_id']
     if not trust_id:
         return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("""
-        SELECT 
-            users.username,users.mobile,posts.title,`request`.id 
-        FROM 
-            users
-        INNER JOIN 
-            posts ON users.id = posts.trust_id
-        INNER JOIN 
-            `request` ON `request`.post_id = posts.id
-        WHERE 
-            `request`.status = %s AND `request`.trust_id = %s""", ["pending", trust_id])
-        requests=cursor.fetchall()
-        print(requests)
+
+    query="SELECT users.username,users.mobile,posts.title,requests.id FROM users INNER JOIN posts ON users.id = posts.trust_id INNER JOIN requests ON requests.post_id = posts.id WHERE requests.progress = %s AND requests.trust_id = %s"
+    params=["pending", trust_id]
+    requests=execute_query(query,params,fetch_one=False)
+
     return render(request,'view_request.html',{'requests':requests})
 
 def create_post(request):
@@ -282,11 +290,10 @@ def create_post(request):
         filename = fs.save(image.name, image)
         image_path = fs.url(filename)
             
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO posts (title, description, image_path, trust_id, district)
-                VALUES (%s, %s, %s, %s, %s)
-                """, [title, description, image_path, trust_id, district])
+        query="INSERT INTO posts (title, description, image_path, trust_id, district) VALUES (%s, %s, %s, %s, %s)"
+        params=[title, description, image_path, trust_id, district]
+        execute_query(query,params,commit=True)
+    
         return redirect('trust_dashboard')   
 
     return render(request, 'create_post.html')
@@ -294,38 +301,31 @@ def create_post(request):
 def delete_post(request, post_id):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
-
     trust_id = request.session['user_id']
     if not trust_id:
         return redirect('login')
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT id FROM posts WHERE id = %s AND trust_id = %s", [post_id, trust_id])
-        post = cursor.fetchone()
-        if post:
-            cursor.execute("DELETE FROM posts WHERE id = %s", [post_id])
 
+    query="SELECT id FROM posts WHERE id = %s AND trust_id = %s"
+    params=[post_id, trust_id]
+    post =execute_query(query,params,fetch_one=True)
+    if post:
+        query1="DELETE FROM posts WHERE id = %s"
+        params=[post_id]
+        execute_query(query1,params,commit=True)
     return redirect('trust_dashboard')
 
 def admin_panel(request):
     if 'is_admin' not in request.session or not request.session['is_admin']:
         return redirect('login') 
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT id, username, email, address, district 
-            FROM users 
-            WHERE user_type = 'trust' AND is_approved = FALSE
-        """)
-        pending_users = cursor.fetchall()
 
+    query="SELECT id, username, email,mobile, address, district FROM users WHERE user_type = 'trust' AND is_approved = FALSE"    
+    pending_users = execute_query(query,fetch_one=False)
     return render(request, 'admin/admin_panel.html', {'pending_users': pending_users})
 
-
 def approve_user(request, user_id):
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            UPDATE users SET is_approved = TRUE WHERE id = %s
-        """, [user_id])
-
+    query=" UPDATE users SET is_approved = TRUE WHERE id = %s"
+    params=[user_id]
+    execute_query(query,params,commit=True)
     return redirect('admin_panel')
 
 def logout(request):
