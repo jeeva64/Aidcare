@@ -1,0 +1,49 @@
+{% extends 'main.html' %}
+{% block title %}Aidcare | Donor Dashboard{% endblock %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li><a href="/admin_dashboard">Dashboard</a></li>
+        <li><a href="">Add Item</a><br></li>
+        <li><a href="">View Inventory</a><br></li>
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/about">About</a></li> 
+        <li><a href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+<h1>Admin Panel - Approve Trust/Orphanage Users</h1>
+<form method="POST">
+    {% csrf_token %}
+<table border="1">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>District</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in pending_users %}
+        <tr>
+            <td>{{ user.1 }}</td>
+            <td><a href="mailto:{{user.2}}">{{ user.2 }}</a></td>
+            <td><a href="tel:{{user.3}}">{{ user.3 }}</a></td>
+            <td>{{ user.4 }}</td>
+            <td>
+                <a href="{% url 'approve_user' user.0 %}"><button class="btn-success">Approve</button></a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No pending approvals.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</form>
+{% endblock %}

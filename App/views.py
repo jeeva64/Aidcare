@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import connection
+from django.db import DatabaseError
 from django.urls import path
 
 def create_tables():
@@ -150,6 +151,8 @@ def login(request):
                 return redirect('donor_dashboard')
             elif user[1] == 'trust':
                 return redirect('trust_dashboard')
+            elif user[1]=='admin':
+                return redirect('admin_panel')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
@@ -165,7 +168,7 @@ def donor_dashboard(request):
     params=[donor_id]
     donor_district = execute_query(query,params,fetch_one=True)[0]
 
-    query1="SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username FROM posts INNER JOIN users ON posts.trust_id = users.id WHERE posts.district = %s AND users.is_approved = TRUE AND posts.status=FALSE"
+    query1="SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username FROM posts INNER JOIN users ON posts.trust_id = users.id WHERE posts.district = %s AND users.is_approved = TRUE"
     params1=[donor_district]
     posts = execute_query(query1,params1,fetch_one=False)
     return render(request, 'donor_dashboard.html', {'posts': posts})
@@ -315,18 +318,26 @@ def delete_post(request, post_id):
     return redirect('trust_dashboard')
 
 def admin_panel(request):
-    if 'is_admin' not in request.session or not request.session['is_admin']:
-        return redirect('login') 
-
+    if 'user_id' not in request.session or request.session['user_type'] != 'admin':
+        return redirect('login')
+    admin_id = request.session['user_id']
+    if not admin_id:
+        return redirect('login')
+    
     query="SELECT id, username, email,mobile, address, district FROM users WHERE user_type = 'trust' AND is_approved = FALSE"    
     pending_users = execute_query(query,fetch_one=False)
-    return render(request, 'admin/admin_panel.html', {'pending_users': pending_users})
+    return render(request, 'admin_panel.html', {'pending_users': pending_users})
 
 def approve_user(request, user_id):
-    query=" UPDATE users SET is_approved = TRUE WHERE id = %s"
-    params=[user_id]
-    execute_query(query,params,commit=True)
-    return redirect('admin_panel')
+    if 'user_id' not in request.session or request.session['user_type'] != 'admin':
+        return redirect('login')
+    
+    if request.method=="POST":
+        query=" UPDATE users SET is_approved = TRUE WHERE is_approved=FALSE and id = %s"
+        params=[user_id]
+        execute_query(query,params,commit=True)
+        return redirect('admin_panel')
+    return render(request,'admin_panel.html')
 
 def logout(request):
     request.session.flush()

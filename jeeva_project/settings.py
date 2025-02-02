@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Application definition
 
@@ -79,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'project_sjc',
         'HOST':'localhost',
-        'USER':'root',
+        'USER':'Admin',
         'PASSWORD':'Jeeva123',
         'PORT':'3306',
     }

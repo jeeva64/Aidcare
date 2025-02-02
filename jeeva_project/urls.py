@@ -16,15 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from App import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('App.urls')),
-    path('admin/approval-panel/',admin.site.admin_view(views.admin_panel), name='admin_panel'),
-    path('admin/approve-user/<int:user_id>/',admin.site.admin_view(views.approve_user), name='approve_user')
 ]
 
 if settings.DEBUG:

@@ -11,6 +11,8 @@ urlpatterns=[
 
     path('donor_dashboard', views.donor_dashboard, name='donor_dashboard'),
     path('trust_dashboard', views.trust_dashboard, name='trust_dashboard'),
+    path('admin_dashboard/',views.admin_panel, name='admin_panel'),
+    path('admin_dashboard/approve_user/<int:user_id>',views.approve_user, name='approve_user'),
 
     path('donor_dashboard/add_item',views.add_item,name="add_item"),
     path('donor_dashboard/donate/<int:post_id>/<int:trust_id>',views.donate,name="donate"),
@@ -20,5 +22,5 @@ urlpatterns=[
 
     path('trust_dashboard/create_post/', views.create_post, name='create_post'),
     path('trust_dashboard/view_request',views.view_request,name="view_request"),
-    path('trust_dashboard/delete_post/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('trust_dashboard/delete_post/<int:post_id>', views.delete_post, name='delete_post'),
 ]
