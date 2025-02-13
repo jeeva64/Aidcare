@@ -2,15 +2,15 @@
 {% block title %}Aidcare | Donor Dashboard{% endblock %}
 {% block nav %}
     {% if 'user_id' in request.session %}
-        <li><a href="/donor_dashboard">Dashboard</a></li>
-        <li><a href="{% url 'add_item' %}">Add Item</a><br></li>
-        <li><a href="{% url 'inventory' %}">View Inventory</a><br></li>
-        <li><a href="/logout">Logout</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/donor_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'add_item' %}">Add Item</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'inventory' %}">View Inventory</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
     {% else %}
-        <li><a href="/register">Register</a></li>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/about">About</a></li> 
-        <li><a href="/contact">Contact</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
     {% endif %}
 {% endblock %}
 {% block content %}

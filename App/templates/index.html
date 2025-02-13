@@ -7,36 +7,47 @@
     <p>Donate your old products or help fulfill a request from a local Trust/Orphanage in your district.</p>
 </div>
    
-<div id="donationSlider" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators" style="list-style: none;">
-        <li data-target="#donationSlider" data-slide-to="0" class="active"></li>
-        <li data-target="#donationSlider" data-slide-to="1"></li>
-        <li data-target="#donationSlider" data-slide-to="2"></li>
-    </ol>
+<div id="donationSlider" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#donationSlider" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#donationSlider" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#donationSlider" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
 
-    <div class="carousel-inner" align="center">
-        <div class="item active">
-            <img src="{% static 'images/donation1.jpg' %}" alt="Donor with items" style="width:75%; height:400px;">
-            <div class="carousel-caption">
-                <h3 style="color:darkgrey;"><strong>Donors Helping the Needy</strong></h3>
+    <div class="carousel-inner text-center">
+        <div class="carousel-item active">
+            <img src="{% static 'images/donation1.jpg' %}" class="d-block w-75 mx-auto" alt="Donor with items" style="height: 400px;">
+            <div class="carousel-caption d-none d-md-block">
+                <h3 class="text-dark"><strong>Donors Helping the Needy</strong></h3>
             </div>
         </div>
 
-        <div class="item">
-            <img src="{% static 'images/donation2.jpg' %}" alt="Orphanage Receiving" style="width:75%;height:400px;">
-            <div class="carousel-caption">
-                <h3 style="color:darkgrey;"><strong>Bridging the Gap</strong></h3>
+        <div class="carousel-item">
+            <img src="{% static 'images/donation2.jpg' %}" class="d-block w-75 mx-auto" alt="Orphanage Receiving" style="height: 400px;">
+            <div class="carousel-caption d-none d-md-block">
+                <h3 class="text-dark"><strong>Bridging the Gap</strong></h3>
             </div>
         </div>
 
-        <div class="item">
-            <img src="{% static 'images/donation3.jpg' %}" alt="Volunteers" style="width:75%;height:400px;">
-            <div class="carousel-caption">
-                <h3 style="color:darkgrey;"><strong>Join Our Mission</strong></h3>
+        <div class="carousel-item">
+            <img src="{% static 'images/donation3.jpg' %}" class="d-block w-75 mx-auto" alt="Volunteers" style="height: 400px;">
+            <div class="carousel-caption d-none d-md-block">
+                <h3 class="text-dark"><strong>Join Our Mission</strong></h3>
             </div>
         </div>
     </div>
-</div><br>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#donationSlider" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#donationSlider" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<br>
+
 
 <div class="call-to-action">
     <h2>How You Can Help</h2>
@@ -45,11 +56,11 @@
 
 <div class="features">
     <div class="feature-box">
-        <h2><span class="glyphicon glyphicon-user"></span> For Donors</h2>
+        <h2><i class="fa fa-user"></i> For Donors</h2>
         <p>Maintain your inventory, view requests, and decide where your items make the most impact.</p>
     </div>
     <div class="feature-box">
-        <h2><span class="glyphicon glyphicon-home"></span> For Trusts</h2>
+        <h2><i class="fa fa-home"></i> For Trusts</h2>
         <p>Create posts to request specific items and connect with local donors in your district.</p>
     </div>
 </div>

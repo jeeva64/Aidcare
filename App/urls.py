@@ -8,11 +8,13 @@ urlpatterns=[
     path('login/',views.login,name="login"),
     path('logout',views.logout,name="logout"),
     path('about',views.about,name="about"),
+    path('contact',views.contact,name="contact"),
+    path('privacy',views.privacy,name="privacy"),
 
     path('donor_dashboard', views.donor_dashboard, name='donor_dashboard'),
     path('trust_dashboard', views.trust_dashboard, name='trust_dashboard'),
     path('admin_dashboard/',views.admin_panel, name='admin_panel'),
-    path('admin_dashboard/approve_user/<int:user_id>',views.approve_user, name='approve_user'),
+    path('approve_user/<int:user_id>',views.approve_user, name='approve_user'),
 
     path('donor_dashboard/add_item',views.add_item,name="add_item"),
     path('donor_dashboard/donate/<int:post_id>/<int:trust_id>',views.donate,name="donate"),

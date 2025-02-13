@@ -2,96 +2,227 @@
 {% load static %}
 {% block content %}
 
-<form method="POST" action="{% url 'register'%}" id="registerForm" novalidate><br>
-    {% csrf_token %}
-    {% if errors %}
-        <ul style="color:red;">
-            {% for tag,error in errors.items %}
-            <li>{{tag}}:{{error}}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center">
+                    <h2>Register</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{% url 'register' %}" id="registerForm" novalidate>
+                        {% csrf_token %}
+                        {% if errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for tag, error in errors.items %}
+                                        <li>{{ tag }}: {{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
 
-    <label for="uname">Username:</label>
-    <input type="text" id="uname" name="username" placeholder="Enter Your Username" required><br>
-    <span id="usernameError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="uname" class="form-label">Username:</label>
+                            <input type="text" class="form-control" id="uname" name="username" placeholder="Enter Your Username" required>
+                            <span id="usernameError" class="text-danger"></span>
+                        </div>
 
-    <label for="mail">Email:</label>
-    <input type="email" id="mail" name="email" placeholder="Enter Your Email" required><br>
-    <span id="emailError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="mail" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="mail" name="email" placeholder="Enter Your Email" required>
+                            <span id="emailError" class="text-danger"></span>
+                        </div>
 
-    <label for="mobile">Mobile Number:</label>
-    <input type="tel" name="mobile" id="mobile" placeholder="Enter Your Mobile Number" pattern="[0-9]{10}" title="Ten digits code" required><br>
-    <span id="mobileError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label">Mobile Number:</label>
+                            <input type="tel" class="form-control" name="mobile" id="mobile" placeholder="Enter Your Mobile Number" pattern="[0-9]{10}" required>
+                            <span id="mobileError" class="text-danger"></span>
+                        </div>
 
-    <label for="address">Address:</label>
-    <input type="text" id="address" name="address" placeholder="Enter Your Address" required><br>
-    <span id="addressError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address:</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter Your Address" required>
+                            <span id="addressError" class="text-danger"></span>
+                        </div>
 
-    <label for="district">District:</label>
-    <select name="district" id="district" required>
-        <option value="">Select District</option>
-        <option value="Ariyalur">Ariyalur</option>
-        <option value="Chengalpattu">Chengalpattu</option>
-        <option value="Chennai">Chennai</option>
-        <option value="Coimbatore">Coimbatore</option>
-        <option value="Cuddalore">Cuddalore</option>
-        <option value="Dharmapuri">Dharmapuri</option>
-        <option value="Dindigul">Dindigul</option>
-        <option value="Erode">Erode</option>
-        <option value="Kallakurichi">Kallakurichi</option>
-        <option value="Kanchipuram">Kanchipuram</option>
-        <option value="Kanyakumari">Kanyakumari</option>
-        <option value="Karur">Karur</option>
-        <option value="Krishnagiri">Krishnagiri</option>
-        <option value="Madurai">Madurai</option>
-        <option value="Mayiladuthurai">Mayiladuthurai</option>
-        <option value="Nagapattinam">Nagapattinam</option>
-        <option value="Namakkal">Namakkal</option>
-        <option value="Nilgiris">Nilgiris</option>
-        <option value="Perambalur">Perambalur</option>
-        <option value="Pudukkottai">Pudukkottai</option>
-        <option value="Ramanathapuram">Ramanathapuram</option>
-        <option value="Ranipet">Ranipet</option>
-        <option value="Salem">Salem</option>
-        <option value="Sivaganga">Sivaganga</option>
-        <option value="Tenkasi">Tenkasi</option>
-        <option value="Thanjavur">Thanjavur</option>
-        <option value="Theni">Theni</option>
-        <option value="Thoothukudi">Thoothukudi</option>
-        <option value="Tiruchirappalli">Tiruchirappalli</option>
-        <option value="Tirunelveli">Tirunelveli</option>
-        <option value="Tirupattur">Tirupattur</option>
-        <option value="Tiruppur">Tiruppur</option>
-        <option value="Tiruvallur">Tiruvallur</option>
-        <option value="Tiruvannamalai">Tiruvannamalai</option>
-        <option value="Tiruvarur">Tiruvarur</option>
-        <option value="Vellore">Vellore</option>
-        <option value="Viluppuram">Viluppuram</option>
-        <option value="Virudhunagar">Virudhunagar</option>
-    </select><br>
-    <span id="districtError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="district" class="form-label">District:</label>
+                            <select name="district" id="district" class="form-select" required>
+                                <option value="">Select District</option>
+                                <option value="Ariyalur">Ariyalur</option>
+                                <option value="Chengalpattu">Chengalpattu</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Coimbatore">Coimbatore</option>
+                                <option value="Cuddalore">Cuddalore</option>
+                                <option value="Dharmapuri">Dharmapuri</option>
+                                <option value="Dindigul">Dindigul</option>
+                                <option value="Erode">Erode</option>
+                                <option value="Kallakurichi">Kallakurichi</option>
+                                <option value="Kanchipuram">Kanchipuram</option>
+                                <option value="Kanyakumari">Kanyakumari</option>
+                                <option value="Karur">Karur</option>
+                                <option value="Krishnagiri">Krishnagiri</option>
+                                <option value="Madurai">Madurai</option>
+                                <option value="Mayiladuthurai">Mayiladuthurai</option>
+                                <option value="Nagapattinam">Nagapattinam</option>
+                                <option value="Namakkal">Namakkal</option>
+                                <option value="Nilgiris">Nilgiris</option>
+                                <option value="Perambalur">Perambalur</option>
+                                <option value="Pudukkottai">Pudukkottai</option>
+                                <option value="Ramanathapuram">Ramanathapuram</option>
+                                <option value="Ranipet">Ranipet</option>
+                                <option value="Salem">Salem</option>
+                                <option value="Sivaganga">Sivaganga</option>
+                                <option value="Tenkasi">Tenkasi</option>
+                                <option value="Thanjavur">Thanjavur</option>
+                                <option value="Theni">Theni</option>
+                                <option value="Thoothukudi">Thoothukudi</option>
+                                <option value="Tiruchirappalli">Tiruchirappalli</option>
+                                <option value="Tirunelveli">Tirunelveli</option>
+                                <option value="Tirupattur">Tirupattur</option>
+                                <option value="Tiruppur">Tiruppur</option>
+                                <option value="Tiruvallur">Tiruvallur</option>
+                                <option value="Tiruvannamalai">Tiruvannamalai</option>
+                                <option value="Tiruvarur">Tiruvarur</option>
+                                <option value="Vellore">Vellore</option>
+                                <option value="Viluppuram">Viluppuram</option>
+                                <option value="Virudhunagar">Virudhunagar</option>
+                            </select>
+                            <span id="districtError" class="text-danger"></span>
+                        </div>
 
-    <label for="u_type">User Type:</label>
-    <select name="user_type" id="u_type" required>
-        <option value="">--select--</option>
-        <option value="donor">Donor</option>
-        <option value="trust">Trust/Orphanage</option>
-    </select><br>
-    <span id="userTypeError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="u_type" class="form-label">User Type:</label>
+                            <select name="user_type" id="u_type" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="donor">Donor</option>
+                                <option value="trust">Trust/Orphanage</option>
+                            </select>
+                            <span id="userTypeError" class="text-danger"></span>
+                        </div>
 
-    <label for="password">Password:</label>
-    <input type="password" name="password" id="password" placeholder="Enter Your Password" required><br>
-    <span id="passwordError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password:</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Enter Your Password" required>
+                            <span id="passwordError" class="text-danger"></span>
+                        </div>
 
-    <labe for="c_pass">Confirm Password:</label>
-    <input type="password" name="cpassword" id="c_pass" placeholder="Enter Your Confirm Password" required><br>
-    <span id="confirmpasswordError" style="color:red;"></span><br>
+                        <div class="mb-3">
+                            <label for="c_pass" class="form-label">Confirm Password:</label>
+                            <input type="password" class="form-control" name="cpassword" id="c_pass" placeholder="Confirm Your Password" required>
+                            <span id="confirmpasswordError" class="text-danger"></span>
+                        </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
-    <button type="reset" class="btn btn-danger">Reset</button>
-</form>
-<br>
-<p>Already have an account?<a href="{% url 'login' %}"> Login here.</a></p>
+                        <div class="mb-3">
+                            <input type="checkbox" id="agree" name="agree_terms" required>
+                            <label for="agree">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>.
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Register</button>
+                            <button type="reset" class="btn btn-secondary btn-lg">Reset</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p>Already have an account? <a href="{% url 'login' %}">Login here.</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="termsModalLabel">Terms and Conditions - AidCare</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome to AidCare! By registering and using our platform, you agree to comply with the following terms and conditions:</p>
+                <ol>
+                    <li><strong>Account Registration:</strong>
+                        <ul>
+                            <li>Users must provide accurate and complete information during registration.</li>
+                            <li>Each orphanage is allowed only one registered account for verification purposes.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Account Security:</strong>
+                        <ul>
+                            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                            <li>Notify us immediately if you suspect any unauthorized use of your account.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Eligibility:</strong>
+                        <ul>
+                            <li>Only verified orphanages and individual donors are permitted to register.</li>
+                            <li>False information may lead to account suspension or termination.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Prohibited Activities:</strong>
+                        <ul>
+                            <li>Users must not engage in fraudulent activities, misrepresentation, or misuse of the platform.</li>
+                            <li>Harassment, offensive content, or any illegal activities are strictly prohibited.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Approval Process:</strong>
+                        <ul>
+                            <li>Orphanage accounts require admin approval before accessing full platform features.</li>
+                            <li>AidCare reserves the right to approve, reject, or deactivate accounts based on compliance.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Liability:</strong>
+                        <ul>
+                            <li>AidCare is not liable for any transactions or interactions between users outside the platform.</li>
+                            <li>We strive to ensure platform security but cannot guarantee uninterrupted access.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Termination:</strong>
+                        <ul>
+                            <li>AidCare reserves the right to terminate accounts that violate these terms without prior notice.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Updates to Terms:</strong>
+                        <ul>
+                            <li>Terms may be updated periodically. Continued use of AidCare implies acceptance of the revised terms.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>By registering, you confirm that you have read, understood, and agreed to these Terms and Conditions. ✅</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    body {
+        background: url('{% static "images/Bg.webp" %}') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Poppins', sans-serif;
+    }
+
+
+    .card {
+        border-radius: 25px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+</style>
 <script src="{% static 'js/validation.js' %}"></script>
 {% endblock %}
+

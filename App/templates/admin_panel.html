@@ -1,23 +1,23 @@
 {% extends 'main.html' %}
-{% block title %}Aidcare | Donor Dashboard{% endblock %}
+{% block title %}Aidcare | Admin Dashboard{% endblock %}
 {% block nav %}
     {% if 'user_id' in request.session %}
-        <li><a href="/admin_dashboard">Dashboard</a></li>
-        <li><a href="">Add Item</a><br></li>
-        <li><a href="">View Inventory</a><br></li>
-        <li><a href="/logout">Logout</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/admin_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="">Dummy</a><br></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="">Dummy</a><br></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
     {% else %}
-        <li><a href="/register">Register</a></li>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/about">About</a></li> 
-        <li><a href="/contact">Contact</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
     {% endif %}
 {% endblock %}
 {% block content %}
-<h1>Admin Panel - Approve Trust/Orphanage Users</h1>
-<form method="POST">
-    {% csrf_token %}
-<table border="1">
+<form method="PUT">
+{% csrf_token %}
+<h1>Admin Panel - Approve Orphanage Users</h1>
+<table border="1" aria-label="Pending Users for Approval">
     <thead>
         <tr>
             <th>Username</th>
@@ -36,6 +36,7 @@
             <td>{{ user.4 }}</td>
             <td>
                 <a href="{% url 'approve_user' user.0 %}"><button class="btn-success">Approve</button></a>
+                <a href=""><button class="btn-danger">Reject</button></a>
             </td>
         </tr>
         {% empty %}

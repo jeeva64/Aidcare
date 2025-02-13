@@ -75,6 +75,12 @@ def home(request):
 def about(request):
     return render(request,"about.html")
 
+def contact(request):
+    return render(request,"contact.html")
+
+def privacy(request):
+    return render(request,"privacy.html")
+
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -331,12 +337,9 @@ def admin_panel(request):
 def approve_user(request, user_id):
     if 'user_id' not in request.session or request.session['user_type'] != 'admin':
         return redirect('login')
-    
-    if request.method=="POST":
-        query=" UPDATE users SET is_approved = TRUE WHERE is_approved=FALSE and id = %s"
-        params=[user_id]
-        execute_query(query,params,commit=True)
-        return redirect('admin_panel')
+    query=" UPDATE users SET is_approved = TRUE WHERE is_approved=FALSE and id = %s"
+    params=[user_id]
+    execute_query(query,params,commit=True)
     return render(request,'admin_panel.html')
 
 def logout(request):
