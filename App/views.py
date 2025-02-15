@@ -57,17 +57,17 @@ def create_tables():
         """)
 
 def execute_query(query,params=None,fetch_one=False,commit=False):
-    try:
+    #try:
         with connection.cursor() as cursor:
-            cursor.execute(query,params)
+            cursor.execute(query,params or [])
             if commit:
                 connection.commit()
+                return cursor.rowcount
             if fetch_one:
                 return cursor.fetchone()
             return cursor.fetchall()
-    except Exception as e:
-        print(f"Error executing query: {e}")
-        return None        
+    #except Exception as e:
+    #    redirect('error') 
 
 def home(request):
     return render(request, "index.html")
@@ -80,6 +80,9 @@ def contact(request):
 
 def privacy(request):
     return render(request,"privacy.html")
+
+def error_page(request):
+    return render(request, 'error.html', {'message': 'Something went wrong. Please try again later.'})
 
 def register(request):
     if request.method == 'POST':
@@ -99,12 +102,12 @@ def register(request):
         errors={}
 
         if len(username)<3 or len(username)>100:
-            errors["username"]="Username must be between 3 and 100 characters."
+            errors["Username"]="Username must be between 3 and 100 characters."
 
         try:
             validate_email(email)
         except ValidationError:
-            errors["email"]="Invalid email format."    
+            errors["Email"]="Invalid email format."    
             
         if len(mobile)<10:
             errors["Phone Number"]="Mobile Number must contain 10 digits."
@@ -112,19 +115,19 @@ def register(request):
         if (len(password)<8 or not any(char.isupper() for char in password) \
             or not any(char.islower() for char in password) or not any(char.isdigit() for char in password) \
             or not any(char in "!@#$%^&*" for char in password)):
-            errors["password"]="Password must be atleast 8 characters long and include uppercase, lowercase, a number, and a special character."
+            errors["Password"]="Password must be atleast 8 characters long and include uppercase, lowercase, a number, and a special character."
 
         if cpassword!=password:
-            errors["confirmpassword"]="Password do not match."
+            errors["Confirm Password"]="Password do not match."
 
         if not address.strip():
-            errors["address"]="Address is required."
+            errors["Address"]="Address is required."
 
         if not district:
-            errors["district"]="Please select a district."
+            errors["District"]="Please select a district."
 
         if user_type not in["donor","trust"]:
-            errors["user_type"]="Invalid user type."
+            errors["User Type"]="Invalid user type."
 
         if errors:
             return render(request,"register.html",{"errors":errors})
@@ -167,42 +170,58 @@ def donor_dashboard(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'donor':
         return redirect('login')
     donor_id = request.session.get('user_id')
-    if not donor_id:
-        return redirect('login')
 
     query="SELECT district FROM users WHERE id = %s"
     params=[donor_id]
     donor_district = execute_query(query,params,fetch_one=True)[0]
 
-    query1="SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username FROM posts INNER JOIN users ON posts.trust_id = users.id WHERE posts.district = %s AND users.is_approved = TRUE"
-    params1=[donor_district]
+    query1="SELECT posts.id, posts.title, posts.description, posts.image_path,posts.trust_id, users.username FROM posts INNER JOIN users ON posts.trust_id = users.id WHERE users.is_approved = TRUE and posts.status=%s and posts.district = %s"
+    params1=["pending",donor_district]
     posts = execute_query(query1,params1,fetch_one=False)
     return render(request, 'donor_dashboard.html', {'posts': posts})
 
 def donate(request,post_id,trust_id):
-    if request.method == 'POST' and 'user_id' in request.session:
-        donor_id = request.session.get('user_id')
-        if not donor_id:
-            return redirect('login')
+    if request.method != 'POST' or 'user_id' not in request.session:
+        return redirect('login')
+    donor_id = request.session.get('user_id')
 
-        query="update posts set status=TRUE where id=%s and trust_id=%s"
-        params=[post_id,trust_id]
-        execute_query(query,params,commit=True)
-
-        query1=" INSERT INTO requests (item_id,trust_id,donor_id,progress)VALUES (%s, %s,%s,%s)"
-        params1=[post_id,trust_id,donor_id,"pending"]
-        execute_query(query1,params1,commit=True)
+    query="UPDATE posts SET status = 'donated' WHERE id = %s AND trust_id = %s"
+    params=[post_id, trust_id]
+    execute_query(query,params,commit=True)
+    
+    query1="INSERT INTO requests (item_id, trust_id, donor_id, progress) VALUES (%s, %s, %s, %s)"
+    params1=[post_id, trust_id, donor_id, "pending"]
+    execute_query(query1,params1,commit=True)
 
     return redirect('donor_dashboard')
 
 def add_item(request):
-    if request.method == 'POST' and 'user_id' in request.session and request.FILES['product']:
+    if request.method == 'POST' and 'user_id' in request.session:
         donor_id = request.session.get('user_id')
-        if not donor_id:
-            return redirect('login')
+        
         name = request.POST['name']
         description = request.POST['description']
-        image = request.FILES['product']
+        image = request.FILES.get('product')
+        valid_types = ["image/jpeg", "image/png", "image/jpg"] #accepted image format
+        max_size = 2 * 1024 * 1024  # 2MB
+        errors={}
+
+        if len(name)<3 or len(name)>25:
+            errors["Item Name"]="Itemname must be between 3 and 25 characters."
+        if not description:
+            errors["Description"]="Item Description is required."
+        if not image:
+            errors["Image"]="Item Image is required."
+        
+        if image.content_type not in valid_types:
+            errors["Image"]="Only JPG, PNG, and JPEG files are allowed."
+
+        if image.size > max_size:
+            errors['Image']="Image size must be less than 2MB."
+
+        if errors:
+            return render(request,"add_item.html",{"errors":errors})
+
         image_path=None
         fs = FileSystemStorage()
         filename = fs.save(image.name, image)
@@ -217,10 +236,8 @@ def add_item(request):
 
 def inventory(request):
     if 'user_id' in request.session and request.method=="GET":
-        donor_id=request.session['user_id']
-        if not donor_id:
-            return redirect('login')
-
+        donor_id=request.session.get('user_id')
+    
         query="SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=FALSE"
         params=[donor_id]
         inventorys=execute_query(query,params,fetch_one=False)
@@ -247,7 +264,7 @@ def mark_as_donated(request, item_id):
 
 def delete_inventory(request,id):
     if 'user_id' in request.session and request.method=="GET":
-        donor_id=request.session['user_id']
+        donor_id=request.session.get('user_id')
         if not donor_id:
             return redirect('login')
 
@@ -260,7 +277,7 @@ def delete_inventory(request,id):
 def trust_dashboard(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
-    trust_id = request.session['user_id']
+    trust_id = request.session.get('user_id')
     if not trust_id:
         return redirect('login')
 
@@ -273,27 +290,46 @@ def trust_dashboard(request):
 def view_request(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
-    trust_id = request.session['user_id']
-    if not trust_id:
-        return redirect('login')
+    trust_id = request.session.get('user_id')
 
-    query="SELECT users.username,users.mobile,posts.title,requests.id FROM users INNER JOIN posts ON users.id = posts.trust_id INNER JOIN requests ON requests.post_id = posts.id WHERE requests.progress = %s AND requests.trust_id = %s"
+    query="SELECT users.username,users.mobile,posts.title,requests.id FROM users INNER JOIN posts ON users.id = posts.trust_id INNER JOIN requests ON requests.id = posts.id WHERE requests.progress = %s AND requests.trust_id = %s"
     params=["pending", trust_id]
-    requests=execute_query(query,params,fetch_one=False)
+    requests=execute_query(query,params)
 
     return render(request,'view_request.html',{'requests':requests})
 
 def create_post(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
-    trust_id = request.session['user_id']
+    trust_id = request.session.get('user_id')
     if not trust_id:
         return redirect('login')
-    if request.method == 'POST' and request.FILES['image']:
+    if request.method == 'POST':
         title = request.POST['title']
         description = request.POST['description']
         district = request.POST['district']
-        image = request.FILES['image']
+        image = request.FILES.get('image')
+        valid_types = ["image/jpeg", "image/png", "image/jpg"] #accepted image format
+        max_size = 2 * 1024 * 1024  # 2MB
+        errors={}
+
+        if len(title)<3 or len(title)>25:
+            errors["Title"]="Post Title must be between 3 and 25 characters."
+        if not description:
+            errors["Description"]="Item Description is required."
+        if not district:
+            errors["District"]="Please select a district."
+        if not image:
+            errors["Image"]="Item Image is required."
+
+        if image.content_type not in valid_types:
+            errors["Image"]="Only JPG, PNG, and JPEG files are allowed."
+
+        if image.size > max_size:
+            errors['Image']="Image size must be less than 2MB."
+
+        if errors:
+            return render(request,"create_post.html",{"errors":errors})
 
         fs = FileSystemStorage()
         filename = fs.save(image.name, image)
@@ -310,7 +346,7 @@ def create_post(request):
 def delete_post(request, post_id):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
-    trust_id = request.session['user_id']
+    trust_id = request.session.get('user_id')
     if not trust_id:
         return redirect('login')
 
@@ -326,7 +362,7 @@ def delete_post(request, post_id):
 def admin_panel(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'admin':
         return redirect('login')
-    admin_id = request.session['user_id']
+    admin_id = request.session.get('user_id')
     if not admin_id:
         return redirect('login')
     

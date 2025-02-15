@@ -10,6 +10,7 @@ urlpatterns=[
     path('about',views.about,name="about"),
     path('contact',views.contact,name="contact"),
     path('privacy',views.privacy,name="privacy"),
+    path('error/',views.error_page, name='error_page'),
 
     path('donor_dashboard', views.donor_dashboard, name='donor_dashboard'),
     path('trust_dashboard', views.trust_dashboard, name='trust_dashboard'),

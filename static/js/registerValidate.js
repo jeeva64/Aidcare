@@ -1,14 +1,14 @@
 document.getElementById("registerForm").addEventListener("submit",function(event){
     
     let valid=true;
-    const username=document.getElementById("uname").value.trim();
-    const email=document.getElementById("mail").value.trim();
-    const mobile=document.getElementById("mobile").value.trim();
-    const address=document.getElementById("address").value.trim();
-    const district=document.getElementById("district").value;
-    const user_type=document.getElementById("u_type").value;
-    const password=document.getElementById("password").value.trim();
-    const confirm_pass=document.getElementById("c_pass").value.trim();
+    var username=document.getElementById("uname").value.trim();
+    var email=document.getElementById("mail").value.trim();
+    var mobile=document.getElementById("mobile").value.trim();
+    var address=document.getElementById("address").value.trim();
+    var district=document.getElementById("district").value;
+    var user_type=document.getElementById("u_type").value;
+    var password=document.getElementById("password").value.trim();
+    var confirm_pass=document.getElementById("c_pass").value.trim();
 
     if(username.length<3 || username.length > 100){
         document.getElementById("usernameError").textContent="Username must be between 3 and 100 characters.";

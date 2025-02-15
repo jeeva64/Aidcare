@@ -1,4 +1,5 @@
 {% extends 'main.html'%}
+{% load static %}
 {% block nav %}
     {% if 'user_id' in request.session %}
         <li class="nav-item"><a class="nav-link fw-bold" href="/trust_dashboard">Dashboard</a></li>
@@ -14,13 +15,24 @@
 {% endblock %}
 {% block content %}
 <h2>Create Post</h2>
-<form method="post" enctype="multipart/form-data">
+<form method="post" id="postForm" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+    {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for tag, error in errors.items %}
+                    <li>{{ tag }}: {{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <label for="title">Title:</label>
-    <input type="text" name="title" id="title"><br><br>
+    <input type="text" name="title" id="title"><br>
+    <span id="titleError" class="text-danger"></span><br>
 
     <label for="description">Description:</label>
-    <textarea name="description" id="description" required></textarea><br><br>
+    <textarea name="description" id="description" required></textarea><br>
+    <span class="text-danger" id="descriptionError"></span><br>
 
     <label for="district">District:</label>
     <select name="district" id="district" required>
@@ -63,11 +75,14 @@
         <option value="Vellore">Vellore</option>
         <option value="Viluppuram">Viluppuram</option>
         <option value="Virudhunagar">Virudhunagar</option>
-    </select><br><br>
+    </select><br>
+    <span id="districtError" class="text-danger"></span><br>
 
     <label for="image">Image:</label>
-    <input type="file" name="image" id="image" required><br><br>
+    <input type="file" name="image" id="image" required><br>
+    <span id="imageError" class="text-danger"></span><br>
 
     <input type="submit" class="btn btn-primary" value="Post">
-</form><br>
+</form>
+<script src="{% static 'js/postValidate.js' %}"></script>
 {% endblock %}

@@ -14,7 +14,6 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-
 <h1>Welcome Donor!</h1>
 <div style="display: flex; flex-wrap: wrap; gap: 20px;">
     {% for post in posts %}
@@ -23,7 +22,10 @@
             <p>{{ post.2 }}</p>
             <img src="{{ post.3 }}" alt="Post Image" style="width: 100%; height: 200px; object-fit: cover;">
             <p><strong>Posted by:</strong> {{ post.5 }}</p>
-            <a href="{%url 'donate' post.0 post.4 %}"><button style="margin-top: 10px;" class="btn btn-primary">Donate</button></a>
+            <form action="{% url 'donate' post.0 post.4 %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" style="margin-top: 10px;">Donate</button>
+            </form>
         </div>
     {% endfor %}
 </div>

@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+{% load static %}
 {% block nav %}
     {% if 'user_id' in request.session %}
         <li class="nav-item"><a class="nav-link fw-bold" href="/donor_dashboard">Dashboard</a></li>
@@ -16,18 +17,30 @@
 {% block content %}
 
 <h1>Add Item</h1>
-<form method="POST"  enctype="multipart/form-data">
+<form method="POST" id="itemForm" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+    {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for tag, error in errors.items %}
+                    <li>{{ tag }}: {{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <label for="name">Item Name:</label>
-    <input type="text" id="name" name="name" required><br><br>
+    <input type="text" id="name" name="name" required><br>
+    <span id="usernameError" class="text-danger"></span><br>
     
     <label for="description">Item Description:</label>
-    <textarea id="description" name="description" required></textarea><br><br>
+    <textarea id="description" name="description" required></textarea><br>
+    <span id="descriptionError" class="text-danger"></span><br>
 
     <label for="product">Upload Image:</label>
-    <input type="file" name="product" id="product" required><br><br>
+    <input type="file" name="product" id="product" required><br>
+    <span id="productError" class="text-danger"></span><br>
 
     <button type="submit" class="btn btn-primary">Add Item</button>
-</form>
-<br>
+</form><br>
+<script src="{% static 'js/itemValidate.js' %}"></script>
 {% endblock %}
