@@ -1,0 +1,72 @@
+{% extends 'main.html' %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/donor_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'add_item' %}">Add Item</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'inventory' %}">View Inventory</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+    {% endif %}
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Your Donation Inventory List</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in inventorys %}
+                <tr>
+                    <td><h5>{{ product.1 }}</h5></td>
+                    <td><h5>{{ product.2 }}</h5></td>
+                    <td><img src="{{ product.3 }}" alt="product-Image" class="img-fluid" style="max-width: 150px; height: 150px; object-fit: cover;"></td>
+                    <td class="text-center">
+                        <a href="{% url 'delete_inventory' product.0 %}" class="btn btn-danger btn-sm">Delete Item</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center"><h5>No Products in your donation inventory.</h5></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-center mt-5 mb-4">Your Donation History</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for history in historys %}
+                <tr>
+                    <td><h5>{{ history.1 }}</h5></td>
+                    <td><h5>{{ history.2 }}</h5></td>
+                    <td><img src="{{ history.3 }}" alt="product-Image" class="img-fluid" style="max-width: 200px; height: 150px; object-fit: cover;"></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center"><h5>No Products in your donation history.</h5></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

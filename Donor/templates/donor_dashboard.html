@@ -14,19 +14,25 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-<h1>Welcome Donor!</h1>
-<div style="display: flex; flex-wrap: wrap; gap: 20px;">
-    {% for post in posts %}
-        <div style="border: 2px solid #ccc; padding: 20px; width: 300px;">
-            <h3>{{ post.1 }}</h3>
-            <p>{{ post.2 }}</p>
-            <img src="{{ post.3 }}" alt="Post Image" style="width: 100%; height: 200px; object-fit: cover;">
-            <p><strong>Posted by:</strong> {{ post.5 }}</p>
-            <form action="{% url 'donate' post.0 post.4 %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success" style="margin-top: 10px;">Donate</button>
-            </form>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Welcome Donor!</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for post in posts %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <img src="{{ post.3 }}" alt="Post Image" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.1 }}</h5>
+                    <p class="card-text">{{ post.2 }}</p>
+                    <p class="card-text"><strong>Posted by:</strong> {{ post.5 }}</p>
+                    <form action="{% url 'donate' post.0 post.4 %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">Donate</button>
+                    </form>
+                </div>
+            </div>
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

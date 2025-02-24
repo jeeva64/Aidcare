@@ -1,0 +1,102 @@
+{% extends 'main.html'%}
+{% load static %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/trust_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'create_post' %}">New Post</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'view_request' %}">Post Response</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-linkf w-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+<div class="container mt-3 d-flex justify-content-center align-items-center" style="height: 80vh;">
+    <div class="col-md-6">
+        <h2>Create Post</h2>
+        <form method="post" id="postForm" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            {% if errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for tag, error in errors.items %}
+                            <li>{{ tag }}: {{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" name="title" id="title" class="form-control" style="max-width: 400px; width: 100%;" required>
+                <span id="titleError" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea name="description" id="description" class="form-control" style="max-width: 400px; width: 100%;" required></textarea>
+                <span class="text-danger" id="descriptionError"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="district" class="form-label">District:</label>
+                <select name="district" id="district" class="form-select" style="max-width: 400px; width: 100%;" required>
+                    <option value="">Select District</option>
+                    <option value="Ariyalur">Ariyalur</option>
+                    <option value="Chengalpattu">Chengalpattu</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Coimbatore">Coimbatore</option>
+                    <option value="Cuddalore">Cuddalore</option>
+                    <option value="Dharmapuri">Dharmapuri</option>
+                    <option value="Dindigul">Dindigul</option>
+                    <option value="Erode">Erode</option>
+                    <option value="Kallakurichi">Kallakurichi</option>
+                    <option value="Kanchipuram">Kanchipuram</option>
+                    <option value="Kanyakumari">Kanyakumari</option>
+                    <option value="Karur">Karur</option>
+                    <option value="Krishnagiri">Krishnagiri</option>
+                    <option value="Madurai">Madurai</option>
+                    <option value="Mayiladuthurai">Mayiladuthurai</option>
+                    <option value="Nagapattinam">Nagapattinam</option>
+                    <option value="Namakkal">Namakkal</option>
+                    <option value="Nilgiris">Nilgiris</option>
+                    <option value="Perambalur">Perambalur</option>
+                    <option value="Pudukkottai">Pudukkottai</option>
+                    <option value="Ramanathapuram">Ramanathapuram</option>
+                    <option value="Ranipet">Ranipet</option>
+                    <option value="Salem">Salem</option>
+                    <option value="Sivaganga">Sivaganga</option>
+                    <option value="Tenkasi">Tenkasi</option>
+                    <option value="Thanjavur">Thanjavur</option>
+                    <option value="Theni">Theni</option>
+                    <option value="Thoothukudi">Thoothukudi</option>
+                    <option value="Tiruchirappalli">Tiruchirappalli</option>
+                    <option value="Tirunelveli">Tirunelveli</option>
+                    <option value="Tirupattur">Tirupattur</option>
+                    <option value="Tiruppur">Tiruppur</option>
+                    <option value="Tiruvallur">Tiruvallur</option>
+                    <option value="Tiruvannamalai">Tiruvannamalai</option>
+                    <option value="Tiruvarur">Tiruvarur</option>
+                    <option value="Vellore">Vellore</option>
+                    <option value="Viluppuram">Viluppuram</option>
+                    <option value="Virudhunagar">Virudhunagar</option>
+                </select>
+                <span id="districtError" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Image:</label>
+                <input type="file" name="image" id="image" class="form-control" style="max-width: 400px; width: 100%;" required>
+                <span id="imageError" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+    </div>
+</div>
+<script src="{% static 'js/postValidate.js' %}"></script>
+{% endblock %}

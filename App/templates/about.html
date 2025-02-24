@@ -1,26 +1,72 @@
 {% extends 'main.html' %}
-{% block content%}
-<div class="about-section container">
-    <h2>About Our Platform</h2>
-    <h3>Virtual Donation Board is a platform designed to facilitate the donation of items directly to those in need. Whether it's old books, clothes, or toys, your contributions can make a significant difference.</h3>
-    <h3>Join hands with us to support trusts and orphanages within your community. Track your inventory, browse donation requests, and make a difference at your convenience.</h3>
+{% block content %}
+<div class="container my-5">
+    <div class="row text-center">
+        <!-- About Us Heading -->
+        <div class="col-12">
+            <h2 class="text-success fw-bold">Welcome to Virtual Donation Board</h2>
+            <p class="text-muted lead">Connecting donors with those in need, one donation at a time.</p>
+        </div>
+    </div>
+
+    <!-- Mission and How It Works -->
+    <div class="row my-4">
+        <div class="col-md-6">
+            <div class="card shadow p-4 border-0">
+                <h3 class="text-primary"><i class="bi bi-people-fill"></i> Our Mission</h3>
+                <p>
+                    Our goal is to bridge the gap between donors and underprivileged communities by making donations seamless and impactful.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow p-4 border-0">
+                <h3 class="text-warning"><i class="bi bi-gift-fill"></i> How It Works</h3>
+                <p>
+                    Register, list items for donation, and let the needy claim them. Track and manage donations effortlessly!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us and What’s Next? -->
+    <div class="row my-4">
+        <div class="col-md-6">
+            <div class="card shadow p-4 border-0">
+                <h3 class="text-info"><i class="bi bi-stars"></i> Why Choose Us?</h3>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-success"></i> 100% Transparent</li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Easy to Use</li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Direct Beneficiary Connection</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow p-4 border-0">
+                <h3 class="text-danger"><i class="bi bi-lightbulb-fill"></i> What’s Next?</h3>
+                <p>We’re constantly improving! Expect new features like AI-based donation recommendations, better tracking, and mobile app integration.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center mt-5">
+        <div class="col-12">
+            <h4>Have questions? <a href="{% url 'contact' %}" class="text-decoration-none text-primary">Contact Us</a></h4>
+        </div>
+    </div>
 </div>
 <style>
-    .about-section {
-            padding: 20px;
-            background-color: #fff;
-            text-align: center;
-        }
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease-in-out;
+    }
 
-        .about-section h2 {
-            font-size: 2em;
-            color: #4CAF50;
-        }
+    .card:hover {
+        transform: translateY(-5px);
+    }
 
-        .about-section p {
-            font-size: 1.1em;
-            color: #666;
-            margin: 20px 0;
-        }
+    h3 i, h4 i {
+        margin-right: 8px;
+    }
 </style>
-{% endblock content%}
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/donor_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'add_item' %}">Add Item</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'inventory' %}">View Inventory</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <h1 class="text-center mb-4">Add Item</h1>
+    <form method="POST" id="itemForm" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        
+        {% if errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for tag, error in errors.items %}
+                        <li>{{ tag }}: {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <label for="name" class="form-label">Item Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+            <span id="usernameError" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Item Description:</label>
+            <textarea id="description" name="description" class="form-control" required></textarea>
+            <span id="descriptionError" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="product" class="form-label">Upload Image:</label>
+            <input type="file" name="product" id="product" class="form-control" required>
+            <span id="productError" class="text-danger"></span>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Add Item</button>
+        </div>
+    </form>
+</div>
+<script src="{% static 'js/itemValidate.js' %}"></script>
+{% endblock %}

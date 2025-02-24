@@ -1,0 +1,55 @@
+{% extends 'main.html' %}
+{% block title %}Aidcare | Admin Dashboard{% endblock %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/admin_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="">Dummy</a><br></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'contact_query' %}">View Contact</a><br></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <h1 class="text-center mb-4">Admin Panel - Approve Orphanage Users</h1>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Mobile Number</th>
+                    <th>District</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pending_users %}
+                <tr>
+                    <td>{{ user.1 }}</td>
+                    <td><a href="mailto:{{ user.2 }}">{{ user.2 }}</a></td>
+                    <td><a href="tel:{{ user.3 }}">{{ user.3 }}</a></td>
+                    <td>{{ user.4 }}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success" formaction="{% url 'approve_user' user.0 %}">Approve</button>
+                            <button type="submit" class="btn btn-danger" formaction="{% url 'reject_user' user.0 %}">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No pending approvals.</td>
+                </tr>                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

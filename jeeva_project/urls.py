@@ -21,6 +21,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('',include('App.urls')),
+    path('',include('user_Auth.urls')),
+    path('',include('Admin.urls')),
+    path('',include('Trust.urls')),
+    path('',include('Donor.urls'),)
 ]
 
 if settings.DEBUG:

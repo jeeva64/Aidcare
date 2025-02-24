@@ -1,26 +1,59 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
-<div>
-    <form action="" method="post" novalidate><br><br>
-        {% csrf_token %}
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" placeholder="Enter Your Name" required><br>
-        <span id="nameError" style="color:red;"></span><br>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card p-3 shadow">
+                <h2 class="text-center mb-2">Contact Us</h2><hr>
+                <form id="contactForm" method="post" novalidate>
+                    {% csrf_token %}
+                    {% if errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for tag, error in errors.items %}
+                                        <li>{{ tag }}: {{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                    {% endif %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Name:</label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter Your Name" required>
+                            <span id="nameError" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="mail" class="form-label">Email:</label>
+                            <input type="email" id="mail" name="email" class="form-control" placeholder="Enter Your Email" required>
+                            <span id="emailError" class="text-danger"></span>
+                        </div>
+                    </div>
 
-        <label for="mail">Email:</label>
-        <input type="email" id="mail" name="email" placeholder="Enter Your Email" required><br>
-        <span id="emailError" style="color:red;"></span><br>
-    
-        <label for="subject">Subject:</label>
-        <input type="text" id="subject" name="subject" placeholder="Enter Your subject" required><br>
-        <span id="subjectError" style="color:red;"></span><br>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="mobile" class="form-label">Mobile Number:</label>
+                            <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="Enter Your Mobile Number" pattern="[0-9]{10}" required>
+                            <span id="mobileError" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="subject" class="form-label">Subject:</label>
+                            <input type="text" id="subject" name="subject" class="form-control" placeholder="Enter Your Subject" required>
+                            <span id="subjectError" class="text-danger"></span>
+                        </div>
+                    </div>
 
-        <label for="message">Message:</label>
-        <textarea id="message" name="message" placeholder="Enter Your Message" required></textarea><br><br>
-        <span id="messageError" style="color:red;"></span><br>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message:</label>
+                        <textarea id="message" name="message" class="form-control" rows="3" placeholder="Enter Your Message" required></textarea>
+                        <span id="messageError" class="text-danger"></span>
+                    </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="{% static 'js/contactValidate.js' %}"></script>
 {% endblock %}

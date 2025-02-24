@@ -9,6 +9,8 @@ document.getElementById("registerForm").addEventListener("submit",function(event
     var user_type=document.getElementById("u_type").value;
     var password=document.getElementById("password").value.trim();
     var confirm_pass=document.getElementById("c_pass").value.trim();
+    var checkbox=document.getElementById("agree");
+
 
     if(username.length<3 || username.length > 100){
         document.getElementById("usernameError").textContent="Username must be between 3 and 100 characters.";
@@ -78,6 +80,13 @@ document.getElementById("registerForm").addEventListener("submit",function(event
     }
     else{
         document.getElementById("confirmpasswordError").textContent="";
+    }
+
+    if (!checkbox.checked) {
+        document.getElementById("checkboxError").textContent = "You must agree to the terms and conditions.";
+        valid=false;
+    } else {
+        document.getElementById("checkboxError").textContent = "";
     }
 
     if(!valid){
