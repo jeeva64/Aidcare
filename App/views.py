@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.core.files.storage import FileSystemStorage
 #from django.contrib.auth.decorators import login_required,login_not_required
@@ -18,11 +19,13 @@ def create_tables():
                 password VARBINARY(32) NOT NULL,
                 address TEXT NOT NULL,
                 district VARCHAR(100) NOT NULL,
-                user_type ENUM('donor', 'trust') NOT NULL,
+                user_type ENUM('donor', 'trust','admin') NOT NULL,
                 is_approved BOOLEAN DEFAULT FALSE,
-                mobile varchar(10) not null
-            );
-        """)
+                mobile varchar(10) not null,
+                is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);"""
+            )
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS posts (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,6 +123,7 @@ def contact(request):
         query="INSERT INTO contact (name,mobile,email,subject,description) VALUES (%s,%s,%s,%s,%s)"
         params=[name,mobile,email,subject,description]
         execute_query(query,params)
+        messages.success(request,"Your Query Submitted Successfully")
     return render(request,"contact.html")
 
 def privacy(request):

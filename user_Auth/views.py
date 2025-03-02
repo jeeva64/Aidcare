@@ -1,13 +1,16 @@
+import hashlib
 from django.shortcuts import render,redirect
-from django.contrib.sessions.models import Session
-from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
+from django.contrib import messages
 #from django.contrib.auth.decorators import login_required,login_not_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import connection
-import hashlib
+from django.core.mail import send_mail
+from .utils import generate_verification_token,verify_token
+from jeeva_project import settings
 from django.db import DatabaseError
-from django.urls import path
+from django_ratelimit.decorators import ratelimit
 
 def execute_query(query,params=None,fetch_one=False,commit=False):
     #try:
@@ -22,6 +25,7 @@ def execute_query(query,params=None,fetch_one=False,commit=False):
     #except Exception as e:
     #    redirect('error')
     
+@ratelimit(key='ip', rate='5/m')
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -78,26 +82,58 @@ def register(request):
         query="INSERT INTO users (username, email, password, address, district, user_type, is_approved,mobile) VALUES (%s, %s, %s, %s, %s, %s, %s,%s)"
         params=[username, email, hashed_password, address, district, user_type, is_approved,mobile]
         execute_query(query,params,commit=True)
+        token = generate_verification_token(email)
+        verification_link = f"{settings.SITE_URL}/verify-email/{token}/"
 
+        send_mail(
+            subject="Verify Your Email - AidCare",
+            message=f"Hello {username},\n\nClick the link below to verify your email:\n{verification_link}",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        messages.success(request,"User Account Registered Successfully and Kindly Verify Your Email!")
         if not is_approved:
             return render(request, 'pending_approval.html')
         return redirect('login')
     
     return render(request, 'register.html')
 
+def verify_email(request, token):
+    email = verify_token(token)
+    if email:
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE users SET is_verified = TRUE WHERE email = %s", [email])
+        return HttpResponse("✅ Email Verified Successfully! You can now log in.")
+    return HttpResponse("❌ Invalid or Expired Verification Link.")
+
+
+@ratelimit(key='ip', rate='100/m')
 def login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        errors={}
 
-        query = "SELECT id, user_type, is_approved, password FROM users WHERE username = %s"
+        if len(username)<3 or len(username)>100:
+            errors["Username"]="Username must be between 3 and 100 characters."
+
+        if len(password)==0:
+            errors["Password"]="Password is Required."
+
+        if errors:
+            return render(request,"login.html",{"errors":errors})
+
+        query = "SELECT id, user_type, is_approved, password ,is_verified FROM users WHERE username = %s"
         params = [username]
         user = execute_query(query, params, fetch_one=True)
-
-        if not user[2]:  
-            return render(request, 'login.html', {'error': 'Account pending approval'})
+        if not user[1]:  
+            return HttpResponse("❌ Please verify your email before logging in.")
         
-        if user:
+        if user is not None:
+            if not user[2]:  
+                return redirect('pending_approval')
+    
             stored_hashed_password = user[3]  
             entered_hashed_password = hashlib.sha256(password.encode()).hexdigest() 
 
@@ -105,15 +141,21 @@ def login(request):
                 request.session['user_id'] = user[0]
                 request.session['user_type'] = user[1]
                 if user[1] == 'donor':
+                    messages.success(request, 'Login successful!')
                     return redirect('donor_dashboard')
                 elif user[1] == 'trust':
+                    messages.success(request, 'Login successful!')
                     return redirect('trust_dashboard')
                 elif user[1]=='admin':
+                    messages.success(request, 'Login successful!')
                     return redirect('admin_panel')
             else:
-                return render(request, 'login.html', {'error': 'Incorrect Password'})
-        else:       
-            return render(request, 'login.html', {'error': 'User not found'})
+                errors["Password"]="Invalid Password"
+                return render(request, 'login.html', {'errors':errors })
+        else:
+            errors["Account"]="User Account Not Found"       
+            return render(request, 'login.html', {'errors': errors})
+        
     return render(request, 'login.html')
 
 def logout(request):

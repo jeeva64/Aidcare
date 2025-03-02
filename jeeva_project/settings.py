@@ -25,6 +25,14 @@ SECRET_KEY = 'django-insecure-hf8(nv)l497odftbptx3f=xgf&ej254wmhqaf8!gr3%3!%z*v$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jeevajeevaloganathan977@gmail.com'  # Replace with your email
+EMAIL_HOST_PASSWORD = 'mmcycshrvozygfwz'  # Use the generated App Password
+
+
 ALLOWED_HOSTS = []
 
 import pymysql
@@ -144,3 +152,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_AGE = 1800  # 1 hour in seconds
 SESSION_SAVE_EVERY_REQUEST = True  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SITE_URL = "http://127.0.0.1:8000"

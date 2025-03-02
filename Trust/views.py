@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
-from django.contrib.sessions.models import Session
-from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.http import HttpResponseBadRequest
+from django.contrib import messages
 #from django.contrib.auth.decorators import login_required,login_not_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -38,30 +39,59 @@ def view_request(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
         return redirect('login')
     trust_id = request.session.get('user_id')
-
-    query="SELECT users.username,users.mobile,posts.title,requests.item_id FROM users INNER JOIN posts ON users.id = posts.trust_id INNER JOIN requests ON requests.item_id = posts.id WHERE requests.progress = 'pending' AND requests.trust_id = %s"
+    query="SELECT donors.username, donors.mobile, posts.title, requests.item_id, donors.email FROM users AS donors INNER JOIN requests ON requests.donor_id = donors.id INNER JOIN posts ON requests.item_id = posts.id WHERE requests.progress = 'pending' AND requests.trust_id = %s"
     params=[trust_id]
     requests=execute_query(query,params)
-
     return render(request,'view_request.html',{'requests':requests})
+    
+def view_donatedItems(request):
+    if request.method=="GET": 
+        query2=" SELECT p.id, p.title, p.description, p.image_path FROM posts p INNER JOIN requests r ON p.id = r.item_id WHERE r.progress = 'approved' AND p.status = 'donated'"
+        historys = execute_query(query2, fetch_one=False)
+        return render(request,'view_donated.html',{'historys':historys})
+    return render(request,"view_donated.html")
 
-def approve_request(request, request_id):
+def approve_request(request, request_id, email, username):
     if 'user_id' not in request.session or request.session.get('user_type') != 'trust':
         return redirect('login')
-    trust_id=request.session.get("user_id")
-    query="UPDATE requests SET progress = 'approved' WHERE trust_id=%s AND item_id = %s"
-    params=[trust_id,request_id]
-    execute_query(query,params,commit=True)
-    return render(request,'view_request.html')
+    trust_id = request.session.get("user_id")
+
+    if request.method == "POST":
+        query = "SELECT id FROM requests WHERE trust_id = %s AND item_id = %s"
+        params = [trust_id, request_id]
+        result = execute_query(query, params, fetch=True)
+
+        if not result:
+            messages.error(request, "Invalid request ID or unauthorized access.")
+            return redirect('view_request')
+
+        send_mail(
+            subject="Your Donation Request Accepted",
+            message=f"Dear {username},\n\nThank you! The orphanage has accepted your donation request. Our representative will contact you shortly.",
+            from_email="jeevajeevaloganathan977@gmail.com",
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        query = "UPDATE requests SET progress = 'approved' WHERE trust_id = %s AND item_id = %s"
+        params = [trust_id, request_id]
+        execute_query(query, params, commit=True)
+
+        messages.success(request, "Approved Request and Email notification sent to the donor!")
+        return redirect('view_request')
+
+    return render(request, 'view_request.html')
 
 def reject_request(request, request_id):
     if 'user_id' not in request.session or request.session.get('user_type') != 'trust':
         return redirect('login')
     trust_id=request.session.get("user_id")
-    query="UPDATE requests SET progress = 'rejected' WHERE trust_id=%s AND item_id = %s"
-    params=[trust_id,request_id]
-    execute_query(query, params, commit=True)
-    return redirect('view_request')
+    if request.method=="POST":
+        query="UPDATE requests SET progress = 'rejected' WHERE trust_id=%s AND item_id = %s"
+        params=[trust_id,request_id]
+        execute_query(query, params, commit=True)
+        messages.success(request,"Rejected Request!")
+        return redirect('view_request')
+    return render(request,"view_request.html")
 
 def create_post(request):
     if 'user_id' not in request.session or request.session['user_type'] != 'trust':
@@ -103,7 +133,7 @@ def create_post(request):
         query="INSERT INTO posts (title, description, image_path, trust_id, district) VALUES (%s, %s, %s, %s, %s)"
         params=[title, description, image_path, trust_id, district]
         execute_query(query,params,commit=True)
-    
+        messages.success(request,"Post Created Successfully!")
         return redirect('trust_dashboard')   
 
     return render(request, 'create_post.html')
@@ -122,4 +152,5 @@ def delete_post(request, post_id):
         query1="DELETE FROM posts WHERE id = %s"
         params=[post_id]
         execute_query(query1,params,commit=True)
+        messages.success(request,"Post Deleted Successfully!")
     return redirect('trust_dashboard')

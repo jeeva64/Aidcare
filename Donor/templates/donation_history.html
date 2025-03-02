@@ -14,7 +14,7 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Your Donation Inventory List</h2>
+    <h2 class="text-center mb-4">Your Donation History</h2>
     <div class="table-responsive">
         <form method="get">
         <table class="table table-bordered table-striped">
@@ -23,22 +23,18 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Image</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for product in inventorys %}
+                {% for history in historys %}
                 <tr>
-                    <td><h5>{{ product.1 }}</h5></td>
-                    <td><h5>{{ product.2 }}</h5></td>
-                    <td><img src="{{ product.3 }}" alt="product-Image" class="img-fluid" style="max-width: 150px; height: 150px; object-fit: cover;"></td>
-                    <td class="text-center">
-                        <a href="{% url 'delete_inventory' product.0 %}" class="btn btn-danger btn-sm">Delete Item</a>
-                    </td>
+                    <td><h5>{{ history.1 }}</h5></td>
+                    <td><h5>{{ history.2 }}</h5></td>
+                    <td><img src="{{ history.3 }}" alt="product-Image" class="img-fluid" style="max-width: 200px; height: 150px; object-fit: cover;"></td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center"><h5>No Products in your donation inventory.</h5></td>
+                    <td colspan="4" class="text-center"><h5>No Products in your donation history.</h5></td>
                 </tr>
                 {% endfor %}
             </tbody>

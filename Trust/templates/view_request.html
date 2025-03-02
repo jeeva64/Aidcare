@@ -3,9 +3,11 @@
     {% if 'user_id' in request.session %}
         <li class="nav-item"><a class="nav-link fw-bold" href="/trust_dashboard">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'create_post' %}">New Post</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'view_donated' %}">Donated Items</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'view_request' %}">Post Response</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
     {% else %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
@@ -14,9 +16,9 @@
 {% endblock %}
 {% block content %}
 <div class="table-responsive mt-4 container">
-<h2 class="text-center">Your Donation Inventory List</h2>
+<h2 class="text-center">Your Posts Responses</h2>
 <table class="table table-bordered table-striped">
-    <thead>
+    <thead class="thead-dark text-center">
         <tr>
             <th>Donor Name</th>
             <th>Mobile Number</th>
@@ -25,17 +27,27 @@
         </tr>
     </thead>
     <tbody>
-        {% for request in requests %} 
-        <tr>
-            <td><h4>{{ request.0 }}</h4></td>
-            <td><h4>{{ request.1 }}</h4></td>
-            <td><h4>{{ request.2 }}</h4></td>
-            <td class="text-center">
-                <a href="{% url 'approve_request' request.3 %}" class="btn btn-success btn-sm">Approve</a>
-                <a href="" class="btn btn-danger btn-sm">Reject</a>
-            </td>
-        </tr>
-        {% endfor %}
+        {% if requests %}
+            {% for request in requests %} 
+            <tr>
+                <td><h4>{{ request.0 }}</h4></td>
+                <td><h4>{{ request.1 }}</h4></td>
+                <td><h4>{{ request.2 }}</h4></td>
+                <td class="text-center">
+                    <form method="POST" action="{% url 'approve_request' request.3 request.4 request.0 %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                    <form method="POST" action="{% url 'reject_request' request.3 %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm mt-2">Reject</button>
+                        </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4" class="text-center">No Donated Items</td></tr>
+        {% endif %}
     </tbody>
 </table>
 </div>

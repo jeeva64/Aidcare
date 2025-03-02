@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.core.files.storage import FileSystemStorage
 #from django.contrib.auth.decorators import login_required,login_not_required
@@ -47,7 +48,7 @@ def donate(request,post_id,trust_id):
     query1="INSERT INTO requests (item_id, trust_id, donor_id, progress) VALUES (%s, %s, %s, %s)"
     params1=[post_id, trust_id, donor_id, "pending"]
     execute_query(query1,params1,commit=True)
-
+    messages.success(request,"Donated Successfully!")
     return redirect('donor_dashboard')
 
 def add_item(request):
@@ -85,6 +86,7 @@ def add_item(request):
         query="INSERT INTO inventory (name, description, image_path, donor_id, is_donated) VALUES (%s, %s, %s, %s, %s)"
         params=[name, description, image_path, donor_id, False]
         execute_query(query,params,commit=True)
+        messages.success(request,"Product Added Successfully")
         return redirect('inventory')
 
     return render(request, 'add_item.html')
@@ -92,7 +94,7 @@ def add_item(request):
 def inventory(request):
     if 'user_id' in request.session and request.method=="GET":
         donor_id=request.session.get('user_id')
-    
+    if request.method=="GET":
         query="SELECT id,name,description,image_path from inventory where donor_id=%s and is_donated=FALSE"
         params=[donor_id]
         inventorys=execute_query(query,params,fetch_one=False)
@@ -101,6 +103,15 @@ def inventory(request):
         historys = execute_query(query2, [donor_id], fetch_one=False)
         return render(request,'inventory.html',{'inventorys':inventorys,'historys':historys})
     return render(request,'inventory.html')     
+
+def donation_history(request):
+    if 'user_id' in request.session and request.method=="GET":
+        donor_id=request.session.get('user_id')
+    if request.method=="GET": 
+        query2=" SELECT p.id, p.title, p.description, p.image_path FROM posts p INNER JOIN requests r ON p.id = r.item_id WHERE r.progress = 'approved' AND r.donor_id = %s AND p.status = 'donated'"
+        historys = execute_query(query2, [donor_id], fetch_one=False)
+        return render(request,'donation_history.html',{'historys':historys})
+    return render(request,'donation_history.html') 
 
 def delete_inventory(request,id):
     if 'user_id' in request.session and request.method=="GET":
@@ -111,5 +122,6 @@ def delete_inventory(request,id):
         query="DELETE from inventory where id=%s and donor_id=%s"
         params=[id,donor_id]
         execute_query(query,params,commit=True)
+        messages.success(request,"Deleted Inventory Successfully!")
         return redirect('inventory')   
     return render(request,'inventory.html')

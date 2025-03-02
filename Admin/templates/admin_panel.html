@@ -3,8 +3,9 @@
 {% block nav %}
     {% if 'user_id' in request.session %}
         <li class="nav-item"><a class="nav-link fw-bold" href="/admin_dashboard">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link fw-bold" href="">Dummy</a><br></li>
-        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'contact_query' %}">View Contact</a><br></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'insert_user' %}">Insert Users</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'view_user' %}">View Users</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'contact_query' %}">View Contact</a></li>
         <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
     {% else %}
         <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
@@ -19,7 +20,7 @@
     
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
+            <thead class="thead-dark text-center">
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
@@ -32,13 +33,13 @@
                 {% for user in pending_users %}
                 <tr>
                     <td>{{ user.1 }}</td>
-                    <td><a href="mailto:{{ user.2 }}">{{ user.2 }}</a></td>
-                    <td><a href="tel:{{ user.3 }}">{{ user.3 }}</a></td>
+                    <td><a href="mailto:{{ user.2 }}" class="text-decoration-none">{{ user.2 }}</a></td>
+                    <td><a href="tel:{{ user.3 }}" class="text-decoration-none">{{ user.3 }}</a></td>
                     <td>{{ user.4 }}</td>
                     <td>
                         <form method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-success" formaction="{% url 'approve_user' user.0 %}">Approve</button>
+                            <button type="submit" class="btn btn-success" formaction="{% url 'approve_user' user.0 user.1 user.2 %}">Approve</button>
                             <button type="submit" class="btn btn-danger" formaction="{% url 'reject_user' user.0 %}">Reject</button>
                         </form>
                     </td>

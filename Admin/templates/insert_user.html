@@ -1,5 +1,20 @@
 {% extends 'main.html' %}
 {% load static %}
+{% block title %}Aidcare | Admin Dashboard{% endblock %}
+{% block nav %}
+    {% if 'user_id' in request.session %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/admin_dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'insert_user' %}">Insert Users</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'view_user' %}">View Users</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'contact_query' %}">View Contact</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/logout">Logout</a></li>
+    {% else %}
+        <li class="nav-item"><a class="nav-link fw-bold" href="/register">Register</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold" href="/about">About</a></li> 
+        <li class="nav-item"><a class="nav-link fw-bold" href="/contact">Contact</a></li>
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 <div class="container mt-3">
@@ -7,10 +22,10 @@
         <div class="col-md-10">
             <div class="card shadow-lg border-0">
                 <div class="card-header text-center">
-                    <h2>Register</h2>
+                    <h2>Insert New User</h2>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{% url 'register' %}" id="registerForm" novalidate>
+                    <form method="POST" action="{% url 'insert_user' %}" id="registerForm" novalidate>
                         {% csrf_token %}
                         {% if errors %}
                             <div class="alert alert-danger">
@@ -101,6 +116,7 @@
                                         <option value="">-- Select --</option>
                                         <option value="donor">Donor</option>
                                         <option value="trust">Trust/Orphanage</option>
+                                        <option value="admin">Admin</option>
                                     </select>
                                     <span id="userTypeError" class="text-danger"></span>
                                 </div>
@@ -119,14 +135,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <input type="checkbox" id="agree" name="agree" required>
-                            <label for="agree">
-                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-decoration-none">Terms and Conditions</a>.
-                            </label><br>
-                            <span id="checkboxError" class="text-danger"></span>
-                        </div>
-
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary btn-md mx-2">Register</button>
                             <button type="reset" class="btn btn-danger btn-md mx-2">Reset</button>
@@ -134,74 +142,6 @@
                         
                     </form>
                 </div>
-                <div class="card-footer text-center">
-                    <p>Already have an account? <a href="{% url 'login' %}" class="text-decoration-none">Login here.</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="termsModalLabel">Terms and Conditions - AidCare</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Welcome to AidCare! By registering and using our platform, you agree to comply with the following terms and conditions:</p>
-                <ol>
-                    <li><strong>Account Registration:</strong>
-                        <ul>
-                            <li>Users must provide accurate and complete information during registration.</li>
-                            <li>Each orphanage is allowed only one registered account for verification purposes.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Account Security:</strong>
-                        <ul>
-                            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-                            <li>Notify us immediately if you suspect any unauthorized use of your account.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Eligibility:</strong>
-                        <ul>
-                            <li>Only verified orphanages and individual donors are permitted to register.</li>
-                            <li>False information may lead to account suspension or termination.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Prohibited Activities:</strong>
-                        <ul>
-                            <li>Users must not engage in fraudulent activities, misrepresentation, or misuse of the platform.</li>
-                            <li>Harassment, offensive content, or any illegal activities are strictly prohibited.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Approval Process:</strong>
-                        <ul>
-                            <li>Orphanage accounts require admin approval before accessing full platform features.</li>
-                            <li>AidCare reserves the right to approve, reject, or deactivate accounts based on compliance.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Liability:</strong>
-                        <ul>
-                            <li>AidCare is not liable for any transactions or interactions between users outside the platform.</li>
-                            <li>We strive to ensure platform security but cannot guarantee uninterrupted access.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Termination:</strong>
-                        <ul>
-                            <li>AidCare reserves the right to terminate accounts that violate these terms without prior notice.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Updates to Terms:</strong>
-                        <ul>
-                            <li>Terms may be updated periodically. Continued use of AidCare implies acceptance of the revised terms.</li>
-                        </ul>
-                    </li>
-                </ol>
-                <p>By registering, you confirm that you have read, understood, and agreed to these Terms and Conditions. ✅</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
