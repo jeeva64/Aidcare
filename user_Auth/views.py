@@ -108,7 +108,7 @@ def verify_email(request, token):
     return HttpResponse("❌ Invalid or Expired Verification Link.")
 
 
-@ratelimit(key='ip', rate='100/m')
+@ratelimit(key='ip', rate='5/m')
 def login(request):
     if request.method == 'POST':
         username = request.POST['username']

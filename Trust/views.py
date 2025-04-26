@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.core.mail import send_mail
 from django.http import HttpResponseBadRequest
 from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
 #from django.contrib.auth.decorators import login_required,login_not_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -19,7 +20,7 @@ def execute_query(query,params=None,fetch_one=False,commit=False):
             if fetch_one:
                 return cursor.fetchone()
             return cursor.fetchall()
-    #except Exception as e:
+    #except Exception as e:-
     #    redirect('error') 
 
 def trust_dashboard(request):

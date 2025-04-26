@@ -16,8 +16,8 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-<div class="container mt-1 d-flex justify-content-center align-items-center" style="height: 80vh;">
-    <div class="card shadow-lg p-4" style="width: 350px;">
+<div class="container mt-5 mb-5 d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg p-4" style="width: 400px;">
         <h2 class="text-center">Create Post</h2>
         <form method="post" id="postForm" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
