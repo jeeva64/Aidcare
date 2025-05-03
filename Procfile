@@ -1,0 +1,1 @@
+web: gunicorn jeeva_project.wsgi
