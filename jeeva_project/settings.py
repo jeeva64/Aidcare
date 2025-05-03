@@ -32,7 +32,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER') # Replace with your email
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Use the generated App Password
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('RAILWAY_STATIC_URL'), 'localhost', '127.0.0.1']
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'jeeva_project.urls'
@@ -90,11 +91,11 @@ WSGI_APPLICATION = 'jeeva_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'project_sjc',
-        'HOST':'localhost',
-        'USER':'Admin',
-        'PASSWORD':'Jeeva123',
-        'PORT':'3306',
+        'NAME': os.getenv('MYSQL_DB'),
+        'USER': os.getenv('MYSQL_USER'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
+        'HOST': os.getenv('MYSQL_HOST'),
+        'PORT': os.getenv('MYSQL_PORT', '3306')
     }
 }
 
