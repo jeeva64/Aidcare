@@ -21,18 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
+SECRET_KEY=os.environ.get('SECRET_KEY')
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER') # Replace with your email
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Use the generated App Password
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') # Replace with your email
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # Use the generated App Password
 
 
-ALLOWED_HOSTS = [os.getenv('RAILWAY_STATIC_URL'), 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [os.environ.get('RAILWAY_STATIC_URL'), 'localhost', '127.0.0.1']
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -91,11 +91,11 @@ WSGI_APPLICATION = 'jeeva_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DB'),
-        'USER': os.getenv('MYSQL_USER'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('MYSQL_HOST'),
-        'PORT': os.getenv('MYSQL_PORT', '3306')
+        'NAME': os.environ.get('MYSQL_DB'),
+        'USER': os.environ.get('MYSQLUSER'),
+        'PASSWORD': os.environ.get('MYSQLPASSWORD'),
+        'HOST': os.environ.get('MYSQLHOST'),
+        'PORT': os.environ.get('MYSQLPORT', '3306')
     }
 }
 
@@ -150,4 +150,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_AGE = 1800  # 1 hour in seconds
 SESSION_SAVE_EVERY_REQUEST = True  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SITE_URL = "http://127.0.0.1:8000"
+SITE_URL = RAILWAY_STATIC_URL
