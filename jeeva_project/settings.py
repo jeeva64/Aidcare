@@ -149,4 +149,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_AGE = 1800  # 1 hour in seconds
 SESSION_SAVE_EVERY_REQUEST = True  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+CSRF_COOKIE_SECURE = True    # Ensures CSRF cookie only sends over HTTPS
+CSRF_COOKIE_HTTPONLY = True # Protects against XSS attacks
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')}",  # Auto-detects Railway URL
+    "https://aidcare.up.railway.app",  # Replace with your actual URL
+    "http://localhost:8000"  # For local development
+]
+SESSION_COOKIE_SECURE = True  # Ensures session cookies are HTTPS-only
 SITE_URL = os.environ.get('RAILWAY_STATIC_URL', '')
