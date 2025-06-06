@@ -143,15 +143,15 @@ Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
 ### 🧑‍💼 Donor Dashboard
 
-![Donor Dashboard](path/to/static/images/Donor.png)
+![Donor Dashboard](static/images/Donor.png)
 
 ### 🏠 Orphanage Dashboard
 
-![Orphanage Form](path/to/static/images/Orphanage.png)
+![Orphanage Form](static/images/Orphanage.png)
 
 ### 🧑‍💻 Admin Dashboard
 
-![Admin Panel](path/to/static/images/Admin.png)
+![Admin Panel](static/images/Admin.png)
 
 
 
