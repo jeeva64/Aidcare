@@ -12,14 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path 
-
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 SECRET_KEY=os.environ.get('SECRET_KEY')
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -30,7 +31,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') # Replace with your email
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # Use the generated App Password
 
 
-ALLOWED_HOSTS = [os.environ.get('RAILWAY_STATIC_URL'), 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -134,7 +135,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Where to collect files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # For caching
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # For caching
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -150,12 +151,7 @@ SESSION_COOKIE_AGE = 1800  # 1 hour in seconds
 SESSION_SAVE_EVERY_REQUEST = True  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-CSRF_COOKIE_SECURE = True    # Ensures CSRF cookie only sends over HTTPS
-CSRF_COOKIE_HTTPONLY = True # Protects against XSS attacks
-CSRF_TRUSTED_ORIGINS = [
-    f"https://{os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')}",  # Auto-detects Railway URL
-    "https://aidcare.up.railway.app",  # Replace with your actual URL
-    "http://localhost:8000"  # For local development
-]
-SESSION_COOKIE_SECURE = True  # Ensures session cookies are HTTPS-only
-SITE_URL = os.environ.get('RAILWAY_STATIC_URL', '')
+# CSRF_COOKIE_SECURE = True    # Ensures CSRF cookie only sends over HTTPS
+# CSRF_COOKIE_HTTPONLY = True # Protects against XSS attacks
+# SESSION_COOKIE_SECURE = True  # Ensures session cookies are HTTPS-only
+SITE_URL = os.environ.get('STATIC_URL', '')
